@@ -55,48 +55,48 @@ export const constantRoutes = [
   {
     path: '/quantization',
     component: Layout,
-    name: 'quantization',
+    name: 'Quantization',
     meta: { title: 'quantization', icon: 'el-icon-data-analysis' },
     children: [
       {
         path: 'basedata',
-        name: 'quantization-base-data',
+        name: 'QuantizationBaseData',
         component: () => import('@/layout/components/MultiLevelMenu'),
         meta: { title: '基础数据', icon: 'table' },
         children: [
           {
             path: 'tradecal',
-            name: 'quantization-trade-cal',
+            name: 'QuantizationBaseDataTradeCal',
             component: () => import('@/views/table/index'),
             meta: { title: '交易日历', icon: 'el-icon-date' }
           },
           {
             path: 'stockbasic',
-            name: 'quantization-stock-basic',
+            name: 'QuantizationBaseDataStockBasic',
             component: () => import('@/views/tree/index'),
             meta: { title: '股票列表', icon: 'table' }
           },
           {
             path: 'daily',
-            name: 'quantization-daily',
+            name: 'QuantizationBaseDataDaily',
             component: () => import('@/views/tree/index'),
             meta: { title: '个股日线行情', icon: 'el-icon-data-line' }
           },
           {
             path: 'concept',
-            name: 'quantization-concept',
+            name: 'QuantizationBaseDataConcept',
             component: () => import('@/views/tree/index'),
             meta: { title: '概念分类', icon: 'nested' }
           },
           {
             path: 'index',
-            name: 'quantization-index',
+            name: 'QuantizationBaseDataIndex',
             component: () => import('@/views/tree/index'),
             meta: { title: '行业分类', icon: 'el-icon-office-building' }
           },
           {
             path: 'moneyflow',
-            name: 'quantization-money-flow',
+            name: 'QuantizationBaseDataMoneyFlow',
             component: () => import('@/views/tree/index'),
             meta: { title: '资金流水', icon: 'el-icon-money' }
           }
@@ -104,19 +104,19 @@ export const constantRoutes = [
       },
       {
         path: 'systemsetting',
-        name: 'quantization-system-setting',
+        name: 'QuantizationSystemSetting',
         component: () => import('@/layout/components/MultiLevelMenu'),
         meta: { title: '系统设置', icon: 'el-icon-setting' },
         children: [
           {
             path: 'InvokeType',
-            name: 'quantization-system-setting-InvokeType',
+            name: 'QuantizationSystemSettingInvokeType',
             component: () => import('@/views/quantization/settings/InvokeType'),
             meta: { title: '调度类型', icon: 'el-icon-cloudy' }
           }, // CollectionPolicyList
           {
             path: 'CollectionPolicyList',
-            name: 'quantization-system-setting-CollectionPolicyList',
+            name: 'QuantizationSystemSettingCollectionPolicyList',
             component: () => import('@/views/quantization/settings/CollectionPolicyList'),
             meta: { title: '调度策略', icon: 'el-icon-cloudy' }
           }
@@ -127,36 +127,36 @@ export const constantRoutes = [
   {
     path: '/permission',
     component: Layout,
-    name: 'permission',
+    name: 'Permission',
     meta: { title: '权限系统', icon: 'password' },
     children: [
       {
         path: 'usermanage',
-        name: 'permission-user-manage',
+        name: 'PermissionUserManage',
         component: () => import('@/views/tree/index'),
         meta: { title: '用户管理', icon: 'user' }
       },
       {
         path: 'authmanage',
-        name: 'permission-auth-manage',
+        name: 'PermissionAuthManage',
         component: () => import('@/views/tree/index'),
         meta: { title: '授权管理', icon: 'eye-open' }
       },
       {
         path: 'objectmanage',
-        name: 'permission-object-manage',
+        name: 'PermissionObjectManage',
         component: () => import('@/views/tree/index'),
         meta: { title: '权限定义', icon: 'example' }
       },
       {
         path: 'nodemanage',
-        name: 'permission-node-manage',
+        name: 'PermissionNodeManage',
         component: () => import('@/views/tree/index'),
         meta: { title: '组织架构', icon: 'tree' }
       },
       {
         path: 'systemsetting',
-        name: 'permission-system-setting',
+        name: 'PermissionSystemSetting',
         component: () => import('@/views/tree/index'),
         meta: { title: '系统设置', icon: 'el-icon-setting' }
       }
@@ -165,18 +165,18 @@ export const constantRoutes = [
   {
     path: '/report',
     component: Layout,
-    name: 'report',
+    name: 'Report',
     meta: { title: '报表系统', icon: 'el-icon-pie-chart' },
     children: [
       {
         path: 'versionnumber',
-        name: 'report-versionnumber',
+        name: 'ReportVersionNumber',
         component: () => import('@/views/tree/index'),
         meta: { title: '版本号管理', icon: 'el-icon-monitor' }
       },
       {
         path: 'queuedatamanage',
-        name: 'report-queuedata',
+        name: 'ReportQueueData',
         component: () => import('@/views/tree/index'),
         meta: { title: '队列数据管理', icon: 'el-icon-s-data' }
       }
@@ -185,24 +185,24 @@ export const constantRoutes = [
   {
     path: '/infoservice',
     component: Layout,
-    name: 'infoservice',
+    name: 'Infoservice',
     meta: { title: '信息服务系统', icon: 'el-icon-message' },
     children: [
       {
         path: 'infotask',
-        name: 'infoservice-infotask',
+        name: 'InfoserviceInfoTask',
         component: () => import('@/views/tree/index'),
         meta: { title: '信息任务队列', icon: 'el-icon-cloudy' }
       },
       {
         path: 'infotaskemail',
-        name: 'infoservice-infotaskemail',
+        name: 'InfoserviceInfoTaskEmail',
         component: () => import('@/views/tree/index'),
         meta: { title: '邮件信息任务队列', icon: 'el-icon-chat-square' }
       },
       {
         path: 'infotasksms',
-        name: 'infoservice-queuedata',
+        name: 'InfoserviceInfoTaskSms',
         component: () => import('@/views/tree/index'),
         meta: { title: '短信信息任务队列', icon: 'el-icon-mobile' }
       }
@@ -211,13 +211,13 @@ export const constantRoutes = [
   {
     path: '/charging',
     component: Layout,
-    name: 'charging',
+    name: 'Charging',
     alwaysShow: true,
     meta: { title: '计费系统', icon: 'el-icon-coin' },
     children: [
       {
         path: 'systask',
-        name: 'charging-systask',
+        name: 'ChargingSystask',
         component: () => import('@/views/tree/index'),
         meta: { title: '队列调度任务', icon: 'el-icon-cloudy' }
       }
@@ -226,24 +226,24 @@ export const constantRoutes = [
   {
     path: '/invoice',
     component: Layout,
-    name: 'invoice',
+    name: 'Invoice',
     meta: { title: '发票系统', icon: 'el-icon-s-ticket' },
     children: [
       {
         path: 'splitorder',
-        name: 'invoice-splitorder',
+        name: 'InvoiceSplitOrder',
         component: () => import('@/views/tree/index'),
         meta: { title: '订单拆分调度队列', icon: 'el-icon-cloudy' }
       },
       {
         path: 'psorder',
-        name: 'invoice-psorder',
+        name: 'InvoicePsOrder',
         component: () => import('@/views/tree/index'),
         meta: { title: '配送单调度队列', icon: 'el-icon-cloudy' }
       },
       {
         path: 'imagepushdwh',
-        name: 'invoice-imagepushdwh',
+        name: 'InvoiceImagePushDwh',
         component: () => import('@/views/tree/index'),
         meta: { title: '影像推送中间表队列', icon: 'el-icon-cloudy' }
       }
@@ -252,13 +252,13 @@ export const constantRoutes = [
   {
     path: '/platform',
     component: Layout,
-    name: 'platform',
+    name: 'Platform',
     alwaysShow: true,
     meta: { title: '平台后台', icon: 'el-icon-s-platform' },
     children: [
       {
         path: 'sysfiletask',
-        name: 'platform-sysfiletask',
+        name: 'PlatformSysFileTask',
         component: () => import('@/views/tree/index'),
         meta: { title: '文件导出导入任务', icon: 'el-icon-cloudy' }
       }
@@ -267,13 +267,13 @@ export const constantRoutes = [
   {
     path: '/paycenter',
     component: Layout,
-    name: 'paycenter',
+    name: 'Paycenter',
     alwaysShow: true,
     meta: { title: '支付系统', icon: 'el-icon-wallet' },
     children: [
       {
         path: 'checkbill',
-        name: 'paycenter-checkbill',
+        name: 'PaycenterCheckBill',
         component: () => import('@/views/tree/index'),
         meta: { title: '账单生成调度', icon: 'el-icon-cloudy' }
       }
