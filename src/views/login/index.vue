@@ -54,6 +54,7 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
+import { platlogin } from '@/api/meiya/common/login'
 
 export default {
   name: 'Login',
@@ -74,8 +75,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: 'yanfa3',
+        password: 'zeckey2017.'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],

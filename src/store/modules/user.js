@@ -1,6 +1,8 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
+import { platlogin, get_platform_login, platform_logout } from '@/api/meiya/common/login'
+import config from '@/config'
 
 const getDefaultState = () => {
   return {
@@ -32,10 +34,10 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      platlogin({ userName: username.trim(), passWord: password ,verifyCode: config.meiya_platform_login_key}).then(response => {
         const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+        commit('SET_TOKEN', data.sessionId)
+        setToken(data.sessionId)
         resolve()
       }).catch(error => {
         reject(error)
@@ -46,17 +48,17 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      get_platform_login({}).then(response => {
         const { data } = response
 
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar } = data
+        
 
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
+        commit('SET_NAME', data.userName)
+        commit('SET_AVATAR', '')
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -67,7 +69,7 @@ const actions = {
   // user logout
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
+      platform_logout({}).then(() => {
         removeToken() // must remove  token  first
         resetRouter()
         commit('RESET_STATE')
