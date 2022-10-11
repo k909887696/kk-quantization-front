@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "vue-cli-service serve",
     "test": "vue-cli-service serve --mode test",
+    "hg": "vue-cli-service serve --mode hg",
     "prod": "vue-cli-service serve --mode prod",
     "build:prod": "vue-cli-service build",
     "build:test": "vue-cli-service build --mode test",
+    "build:hg": "vue-cli-service build --mode hg",
     "build:stage": "vue-cli-service build --mode staging",
     "preview": "node build/index.js --preview",
     "svgo": "svgo -f src/icons/svg --config=src/icons/svgo.yml",

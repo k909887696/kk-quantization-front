@@ -54,7 +54,6 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
-import { platlogin } from '@/api/meiya/common/login'
 
 export default {
   name: 'Login',

@@ -1,4 +1,3 @@
-import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 import { platlogin, get_platform_login, platform_logout } from '@/api/meiya/common/login'
@@ -34,7 +33,7 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      platlogin({ userName: username.trim(), passWord: password ,verifyCode: config.meiya_platform_login_key}).then(response => {
+      platlogin({ userName: username.trim(), passWord: password, verifyCode: config.meiya_platform_login_key }).then(response => {
         const { data } = response
         commit('SET_TOKEN', data.sessionId)
         setToken(data.sessionId)
@@ -54,11 +53,8 @@ const actions = {
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
-
-        
-
         commit('SET_NAME', data.userName)
-        commit('SET_AVATAR', '')
+        commit('SET_AVATAR', data.avatar || config.default_user_icon)
         resolve(data)
       }).catch(error => {
         reject(error)

@@ -6,7 +6,7 @@ export function platlogin(params, isLoading) {
     url: config.meiya_tmcjurisdiction_api_url + '/apixs/v1/apixs/platlogin',
     method: 'post',
     data: params,
-    headers: {'source':config.meiya_platform_api_source,'version':'1','Accept': '*/*'},
+    headers: { 'source': config.meiya_platform_api_source, 'version': '1', 'Accept': '*/*' },
     isLoading
   })
 }
@@ -16,7 +16,7 @@ export function get_platform_login(params, isLoading) {
     url: config.meiya_tmcjurisdiction_api_url + '/apis/v1/logininfo/get_platform_login',
     method: 'post',
     data: params,
-    headers: {'source':config.meiya_platform_api_source,'version':'1'},
+    headers: { 'source': config.meiya_platform_api_source, 'version': '1' },
     isLoading
   })
 }
@@ -26,7 +26,7 @@ export function platform_logout(params, isLoading) {
     url: config.meiya_tmcjurisdiction_api_url + '/apis/v1/logininfo/platform_logout',
     method: 'post',
     data: params,
-    headers: {'source':config.meiya_platform_api_source,'version':'1'},
+    headers: { 'source': config.meiya_platform_api_source, 'version': '1' },
     isLoading
   })
 }
@@ -36,10 +36,7 @@ export function valid_platform_jurisdiction(params, isLoading) {
     url: config.meiya_tmcjurisdiction_api_url + '/apis/v1/logininfo/valid_platform_jurisdiction',
     method: 'post',
     data: params,
-    headers: {'source':config.meiya_platform_api_source,'version':'1'},
+    headers: { 'source': config.meiya_platform_api_source, 'version': '1' },
     isLoading
   })
 }
-
-
-
