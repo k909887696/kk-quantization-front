@@ -3,9 +3,8 @@ import store from './store'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
-import { getToken } from '@/utils/auth' // get token from cookie
+import { getToken, validPlatformJurisdiction } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
-import rootrouters from '@/router/rootrouters'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
@@ -32,9 +31,12 @@ router.beforeEach(async(to, from, next) => {
         try {
           // get user info
           await store.dispatch('user/getInfo')
-          console.log(rootrouters.allRoutes)
-          // router.addRoutes(rootrouters.allRoutes)
-
+          if (to.meta && to.meta.menus && to.meta.check_permission) {
+            if (!validPlatformJurisdiction(to.meta.menus)) {
+              next({ path: '/401' })
+            }
+          }
+          await store.dispatch('permission/generateRoutes')
           next()
         } catch (error) {
           // remove token and go to login page to re-login

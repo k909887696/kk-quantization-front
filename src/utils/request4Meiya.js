@@ -53,7 +53,6 @@ service.interceptors.response.use(
       loadingObj.loadingHide()
     }
     const res = response.data
-    console.log(response)
     console.log(res)
     // if the custom code is not 20000, it is judged as an error.
     if (res.result !== '200') {
