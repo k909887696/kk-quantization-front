@@ -15,6 +15,7 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     config.isLoading = config.isLoading === undefined ? true : config.isLoading
+    config.isPrompt = config.isPrompt === undefined ? true : config.isPrompt
     if (config.isLoading) {
       loadingObj.loadingShow()
     }
@@ -53,7 +54,7 @@ service.interceptors.response.use(
       loadingObj.loadingHide()
     }
     const res = response.data
-    console.log(res)
+    // console.log(res)
     // if the custom code is not 20000, it is judged as an error.
     if (res.result !== '200') {
       Message({
@@ -77,11 +78,13 @@ service.interceptors.response.use(
       }
       return Promise.reject(new Error(res.desc || 'Error'))
     } else {
-      Message({
-        message: res.desc || '请求成功！',
-        type: 'success',
-        duration: 2 * 1000
-      })
+      if (response.config.isPrompt) {
+        Message({
+          message: res.desc || '请求成功！',
+          type: 'success',
+          duration: 2 * 1000
+        })
+      }
       return res
     }
   },

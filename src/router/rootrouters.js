@@ -336,7 +336,7 @@ const constantRoutes = [
     children: [
       {
         path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link', menus: 'dddddd' }
+        meta: { title: 'External Link', icon: 'link', menus: 'dddddd', check_permission: true }
       }
     ]
   },
@@ -350,16 +350,16 @@ function filterAsyncMenus(routes) {
     const tmp = { ...route }
     if (tmp.meta) {
       if (tmp.meta.menus && tmp.meta.menus !== '') {
-        console.log('generateMenus-forEach:' + tmp.meta.menus)
+        // console.log('generateMenus-forEach:' + tmp.meta.menus)
         res.push(tmp.meta.menus)
       }
-      if (tmp.children) {
-        const tmpmenus = filterAsyncMenus(tmp.children)
-        if (tmpmenus && tmpmenus.length > 0) {
-          tmpmenus.forEach(menu => {
-            res.push(menu)
-          })
-        }
+    }
+    if (tmp.children) {
+      const tmpmenus = filterAsyncMenus(tmp.children)
+      if (tmpmenus && tmpmenus.length > 0) {
+        tmpmenus.forEach(menu => {
+          res.push(menu)
+        })
       }
     }
   })
@@ -368,7 +368,7 @@ function filterAsyncMenus(routes) {
 
 function generateMenus() {
   const res = filterAsyncMenus(constantRoutes)
-  console.log('generateMenus' + JSON.stringify(res))
+  // console.log('generateMenus' + JSON.stringify(res))
   return res
 }
 

@@ -20,3 +20,17 @@ export function validPlatformJurisdiction(permission) {
     return response.data.jurisdictions[permission] && response.data.jurisdictions[permission] === '1'
   })
 }
+
+export function getPermissionPlatformJurisdiction(allPermissions) {
+  const validRequest = { jurisdictionIds: allPermissions || [] }
+  const permissions = []
+  valid_platform_jurisdiction(validRequest).then(response => {
+    allPermissions.forEach(p => {
+      if (response.data.jurisdictions[p] && response.data.jurisdictions[p] === '1') {
+        permissions.push(p)
+      }
+    })
+  })
+  // console.log(permissions)
+  return permissions
+}

@@ -1,4 +1,5 @@
 import rootrouters from '@/router/rootrouters'
+import { getPermissionPlatformJurisdiction } from '@/utils/auth'
 
 /**
  * Use meta.role to determine if the current user has permission
@@ -16,7 +17,7 @@ function hasPermission(permissions, route) {
 /**
  * Filter asynchronous routing tables by recursion
  * @param routes asyncRoutes
- * @param roles
+ * @param permissions
  */
 export function filterAsyncRoutes(routes, permissions) {
   const res = []
@@ -47,7 +48,7 @@ const mutations = {
 const actions = {
   generateRoutes({ commit }) {
     return new Promise(resolve => {
-      const permissions = ['ddd']
+      const permissions = getPermissionPlatformJurisdiction(rootrouters.allmenus)
       const accessedRoutes = filterAsyncRoutes(rootrouters.constantRoutes, permissions)
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)

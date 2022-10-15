@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '监控管理平台',
+  title: process.env.VUE_APP_TITLE,
 
   /**
    * @type {boolean} true | false

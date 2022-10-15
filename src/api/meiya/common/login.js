@@ -17,7 +17,8 @@ export function get_platform_login(params, isLoading) {
     method: 'post',
     data: params,
     headers: { 'source': config.meiya_platform_api_source, 'version': '1' },
-    isLoading
+    isLoading,
+    isPrompt: false
   })
 }
 
@@ -37,6 +38,7 @@ export function valid_platform_jurisdiction(params, isLoading) {
     method: 'post',
     data: params,
     headers: { 'source': config.meiya_platform_api_source, 'version': '1' },
-    isLoading
+    isLoading,
+    isPrompt: false
   })
 }
