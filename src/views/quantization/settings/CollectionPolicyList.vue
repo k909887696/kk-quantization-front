@@ -47,59 +47,59 @@
     >
       <el-table-column align="center" label="策略编号" width="150">
         <template slot-scope="scope">
-          {{ scope.row.PolicyId }}
+          {{ scope.row.policyId }}
         </template>
       </el-table-column>
       <el-table-column label="策略名称" width="250">
         <template slot-scope="scope">
-          {{ scope.row.Name }}
+          {{ scope.row.name }}
         </template>
       </el-table-column>
       <el-table-column label="执行类型编号" width="150" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.InvokeId }}</span>
+          <span>{{ scope.row.invokeCode }}</span>
         </template>
       </el-table-column>
       <el-table-column label="执行周期" width="100" align="center">
         <template slot-scope="scope">
-          {{ scope.row.InvokeCycle }}
+          {{ scope.row.invokeCycle }}
         </template>
       </el-table-column>
       <el-table-column align="center" prop="created_at" label="周期次数" width="60">
         <template slot-scope="scope">
-          <span>{{ scope.row.RunTime }}</span>
+          <span>{{ scope.row.invokeCycleTime }}</span>
         </template>
       </el-table-column>
       <el-table-column class-name="status-col" width="200" label="执行参数" align="center">
         <template slot-scope="scope">
-          {{ scope.row.InvokeParams }}
+          {{ scope.row.invokeParams }}
         </template>
       </el-table-column>
       <el-table-column label="执行类型名称" width="120" align="center">
         <template slot-scope="scope">
-          {{ scope.row.InvokeName }}
+          {{ scope.row.invokeMethod }}
         </template>
       </el-table-column>
       <el-table-column label="异常次数（超过10次自动挂起）" width="100" align="center">
         <template slot-scope="scope">
-          {{ scope.row.RunCount }}
+          {{ scope.row.runCount }}
         </template>
       </el-table-column>
       <el-table-column label="异常信息" align="center">
         <template slot-scope="scope">
-          {{ scope.row.ExMsg }}
+          {{ scope.row.exMsg }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="预定执行时间" width="110">
         <template slot-scope="scope">
           <i class="el-icon-time" />
-          <span>{{ parseTime(new Date(scope.row.NextRunTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+          <span>{{ parseTime(new Date(scope.row.preRunTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" prop="created_at" label="创建时间" width="100">
         <template slot-scope="scope">
           <i class="el-icon-time" />
-          <span>{{ scope.row.Createtime }}</span>
+          <span>{{ parseTime(new Date(scope.row.createTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="" align="center" width="100" class-name="small-padding fixed-width">
@@ -110,38 +110,45 @@
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.PageIndex" :limit.sync="listQuery.PageSize" @pagination="getList" />
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.pageIndex" :limit.sync="listQuery.pageSize" @pagination="getList" />
     <el-dialog title="调度策略编辑" :visible.sync="dialogFormVisible" :close-on-click-modal="false" top="50px">
       <el-form ref="dataForm" :model="temp" label-position="right" label-width="110px" style="width: 400px; margin-left:50px;">
         <el-form-item label="策略编号" prop="type">
-          <el-input v-model="temp.PolicyId" readonly disabled />
+          <el-input v-model="temp.policyId" readonly disabled />
         </el-form-item>
         <el-form-item label="策略名称" prop="type">
-          <el-input v-model="temp.Name" />
+          <el-input v-model="temp.name" />
         </el-form-item>
-        <el-form-item label="执行类型编号" prop="type">
-          <el-input v-model="temp.InvokeId" />
+        <el-form-item label="调度类型编号" prop="type">
+          <el-select v-model="temp.invokeCode" >
+            <el-option
+              v-for="item in invokeTypeList"
+              :key="item.invokeCode"
+              :label="item.name"
+              :value="item.invokeCode">
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="执行周期" prop="type">
-          <el-input v-model="temp.InvokeCycle" />
+        <el-form-item label="调度周期" prop="type">
+          <el-input v-model="temp.invokeCycle" />
         </el-form-item>
-        <el-form-item label="周期次数" prop="type">
-          <el-input v-model="temp.RunTime" />
+        <el-form-item label="调度周期次数" prop="type">
+          <el-input v-model="temp.invokeCycleTime" />
         </el-form-item>
         <el-form-item label="预定执行时间" prop="type">
-          <el-date-picker v-model="temp.NextRunTime" type="datetime" format="yyyy-MM-dd HH:mm:ss" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择时间" />
+          <el-date-picker v-model="temp.preRunTime" type="datetime" format="yyyy-MM-dd HH:mm:ss" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择时间" />
         </el-form-item>
-        <el-form-item label="执行参数" prop="type">
-          <el-input v-model="temp.InvokeParams" />
+        <el-form-item label="调度类型参数" prop="type">
+          <el-input v-model="temp.invokeParams" />
         </el-form-item>
-        <el-form-item label="执行类型名称" prop="type">
-          <el-input v-model="temp.InvokeName" />
+        <el-form-item label="调度类型方法" prop="type">
+          <el-input v-model="temp.invokeMethod" />
         </el-form-item>
         <el-form-item label="执行次数" prop="type">
-          <el-input v-model="temp.RunCount" />
+          <el-input v-model="temp.runCount" />
         </el-form-item>
         <el-form-item label="异常信息" prop="type">
-          <el-input v-model="temp.ExMsg" />
+          <el-input v-model="temp.exMsg" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -157,7 +164,7 @@
 </template>
 
 <script>
-import { queryCollectionPolicyListPage, updateCollectionPolicy, addCollectionPolicy } from '@/api/quantization/settings'
+import { get_collection_policy_page_result, update_policy, insert_policy, get_invoke_type_page_result } from '@/api/quantization/settings'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { parseTime } from '@/utils/index.js'
 import waves from '@/directive/waves' // waves directive
@@ -185,51 +192,54 @@ export default {
     return {
       list: null,
       total: 0,
+      invokeTypeList: [],
       listQuery: {
-        Name: undefined,
-        PolicyId: undefined,
-        InvokeId: undefined,
-        IsExpetion: -1,
-        StartRunTime: '',
-        EndRunTime: '',
-        PageIndex: 1,
-        PageSize: 10
+        name: undefined,
+        policyId: undefined,
+        invokeCode: undefined,
+        pageIndex: 1,
+        pageSize: 10
       },
       isExpetionOptions,
       dialogFormVisible: false,
       temp: {
-        PolicyId: undefined,
-        Name: undefined,
-        InvokeId: undefined,
-        InvokeCycle: undefined,
-        NextRunTime: undefined,
-        InvokeParams: undefined,
-        RunCount: undefined,
-        RunTime: undefined,
-        ExMsg: undefined,
-        InvokeName: undefined
+        policyId: undefined,
+        name: undefined,
+        invokeCode: undefined,
+        invokeCycle: undefined,
+        preRunTime: undefined,
+        invokeParams: undefined,
+        runCount: undefined,
+        invokeCycleTime: undefined,
+        exMsg: undefined,
+        invokeMethod: undefined
       },
       dialogStatus: 'add'
     }
   },
   created() {
     this.getList()
+    get_invoke_type_page_result({ pageIndex: 1, pageSize: 100 }).then(response => {
+      this.invokeTypeList = response.data === null ? [] : response.data.result
+    })
   },
   methods: {
     getList() {
-      queryCollectionPolicyListPage(this.listQuery).then(response => {
-        this.list = response.data === null ? [] : response.data.SQLResult
-        this.total = response.data === null ? 0 : response.data.TotalRecordCount
+      get_collection_policy_page_result(this.listQuery).then(response => {
+        this.list = response.data === null ? [] : response.data.result
+        this.total = response.data === null ? 0 : response.data.totalCount
       })
     },
     updateData() {
-      updateCollectionPolicy(this.temp).then(response => {
+      this.temp.preRunTime = new Date(this.temp.preRunTime)
+      update_policy(this.temp).then(response => {
         this.dialogFormVisible = false
         this.getList()
       })
     },
     addData() {
-      addCollectionPolicy(this.temp).then(response => {
+      this.temp.preRunTime = new Date(this.temp.preRunTime)
+      insert_policy(this.temp).then(response => {
         this.dialogFormVisible = false
         this.getList()
       })
@@ -237,7 +247,7 @@ export default {
     editDataDialog(row) {
       this.dialogStatus = 'update'
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.NextRunTime = parseTime(new Date(row.NextRunTime), '{y}-{m}-{d} {h}:{i}:{s}')
+      this.temp.preRunTime = parseTime(new Date(row.preRunTime), '{y}-{m}-{d} {h}:{i}:{s}')
       this.dialogFormVisible = true
     },
     addDataDialog(row) {

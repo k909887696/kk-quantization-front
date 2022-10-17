@@ -1,36 +1,36 @@
 import request from '@/utils/request4Quantization'
 import config from '@/config'
 
-export function queryAllInvokeType(params, isLoading) {
+export function get_invoke_type_page_result(params, isLoading) {
   return request({
-    url: config.quantization_api_url + '/api/v1/tushare/collectiontask/queryAllInvokeType',
-    method: 'post',
-    params,
-    isLoading
-  })
-}
-
-export function queryCollectionPolicyListPage(params, isLoading) {
-  return request({
-    url: config.quantization_api_url + '/api/v1/tushare/collectiontask/queryCollectionPolicyListPage',
+    url: config.quantization_api_url + '/quantization/api/v1/invoke_type/get_invoke_type_page_result',
     method: 'post',
     data: params,
     isLoading
   })
 }
 
-export function addCollectionPolicy(params, isLoading) {
+export function get_collection_policy_page_result(params, isLoading) {
   return request({
-    url: config.quantization_api_url + '/api/v1/tushare/collectiontask/addCollectionPolicy',
+    url: config.quantization_api_url + '/quantization/api/v1/collection_policy/get_collection_policy_page_result',
     method: 'post',
     data: params,
     isLoading
   })
 }
 
-export function updateCollectionPolicy(params, isLoading) {
+export function insert_policy(params, isLoading) {
   return request({
-    url: config.quantization_api_url + '/api/v1/tushare/collectiontask/updateCollectionPolicy',
+    url: config.quantization_api_url + '/quantization/api/v1/collection_policy/insert_policy',
+    method: 'post',
+    data: params,
+    isLoading
+  })
+}
+
+export function update_policy(params, isLoading) {
+  return request({
+    url: config.quantization_api_url + '/quantization/api/v1/collection_policy/update_policy',
     method: 'post',
     data: params,
     isLoading
