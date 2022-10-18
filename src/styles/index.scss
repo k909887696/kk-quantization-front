@@ -73,3 +73,9 @@ div:focus {
     margin-bottom: 10px;
   }
 }
+
+.messageIndex {
+
+  z-index: 9999 !important; // 设置的值一定要比2007大，因为dialog的层级是2007
+
+}

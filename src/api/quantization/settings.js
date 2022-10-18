@@ -10,29 +10,12 @@ export function get_invoke_type_page_result(params, isLoading) {
   })
 }
 
-export function get_collection_policy_page_result(params, isLoading) {
+export function get_base_data_item_map(params, isLoading) {
   return request({
-    url: config.quantization_api_url + '/quantization/api/v1/collection_policy/get_collection_policy_page_result',
+    url: config.quantization_api_url + '/quantization/api/v1/basedata/get_base_data_item_map',
     method: 'post',
     data: params,
-    isLoading
-  })
-}
-
-export function insert_policy(params, isLoading) {
-  return request({
-    url: config.quantization_api_url + '/quantization/api/v1/collection_policy/insert_policy',
-    method: 'post',
-    data: params,
-    isLoading
-  })
-}
-
-export function update_policy(params, isLoading) {
-  return request({
-    url: config.quantization_api_url + '/quantization/api/v1/collection_policy/update_policy',
-    method: 'post',
-    data: params,
-    isLoading
+    isLoading,
+    isPrompt: false
   })
 }

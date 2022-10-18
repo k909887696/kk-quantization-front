@@ -51,7 +51,7 @@
       <el-table-column align="center" prop="created_at" label="创建时间" width="200">
         <template slot-scope="scope">
           <i class="el-icon-time" />
-          <span>{{ scope.row.createTime }}</span>
+          <span>{{ parseTime(new Date(scope.row.createTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -61,9 +61,9 @@
 
 <script>
 import { get_invoke_type_page_result } from '@/api/quantization/settings'
+import { parseTime } from '@/utils/index.js'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import waves from '@/directive/waves' // waves directive
-
 export default {
   components: { Pagination },
   directives: { waves },
@@ -101,7 +101,8 @@ export default {
         // this.listQuery.pageIndex = response.data.pageIndex
         // this.listLoading = false
       })
-    }
+    },
+    parseTime: parseTime
   }
 }
 </script>

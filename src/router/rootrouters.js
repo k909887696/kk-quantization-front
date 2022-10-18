@@ -90,14 +90,26 @@ const constantRoutes = [
           {
             path: 'InvokeType',
             name: 'QuantizationSystemSettingInvokeType',
-            component: () => import('@/views/quantization/settings/InvokeType'),
+            component: () => import('@/views/quantization/settings/invoke_type_list'),
             meta: { title: '调度类型', icon: 'el-icon-cloudy', menus: 'menu_QuantizationSystemSettingInvokeType', check_permission: false }
-          }, // CollectionPolicyList
+          },
           {
             path: 'CollectionPolicyList',
             name: 'QuantizationSystemSettingCollectionPolicyList',
-            component: () => import('@/views/quantization/settings/CollectionPolicyList'),
+            component: () => import('@/views/quantization/settings/collection_policy_list'),
             meta: { title: '调度策略', icon: 'el-icon-cloudy', menus: 'menu_QuantizationSystemSettingCollectionPolicyList', check_permission: false }
+          },
+          {
+            path: 'CollectionTaskList',
+            name: 'QuantizationSystemSettingCollectionPolicyList',
+            component: () => import('@/views/quantization/settings/collection_task_list'),
+            meta: { title: '调度任务', icon: 'el-icon-cloudy', menus: 'menu_QuantizationSystemSettingCollectionTaskList', check_permission: false }
+          },
+          {
+            path: 'CollectionTaskHistoryList',
+            name: 'QuantizationSystemSettingCollectionPolicyList',
+            component: () => import('@/views/quantization/settings/collection_task_history_list'),
+            meta: { title: '调度任务历史', icon: 'el-icon-cloudy', menus: 'menu_QuantizationSystemSettingCollectionTaskHistoryList', check_permission: false }
           }
         ]
       }

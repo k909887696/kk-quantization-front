@@ -15,8 +15,15 @@
           </el-form-item>
         </el-row>
         <el-row>
-          <el-form-item label="执行类型编号:">
-            <el-input v-model="listQuery.InvokeId" placeholder="执行类型" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+          <el-form-item label="调度类型:">
+            <el-select v-model="listQuery.invokeCode" style="width: 200px;" placeholder="请选择">
+            <el-option
+               v-for="item in invokeTypeList"
+              :key="item.invokeCode"
+              :label="item.name"
+              :value="item.invokeCode">
+            </el-option>
+          </el-select>
           </el-form-item>
           <el-form-item label="是否异常:">
             <el-select v-model="listQuery.IsExpetion" placeholder="是否异常" clearable class="filter-item" style="width: 200px">
@@ -50,7 +57,7 @@
           {{ scope.row.policyId }}
         </template>
       </el-table-column>
-      <el-table-column label="策略名称" width="250">
+      <el-table-column label="策略名称" width="220">
         <template slot-scope="scope">
           {{ scope.row.name }}
         </template>
@@ -60,27 +67,27 @@
           <span>{{ scope.row.invokeCode }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="执行周期" width="100" align="center">
+      <el-table-column label="执行周期" width="50" align="center">
         <template slot-scope="scope">
-          {{ scope.row.invokeCycle }}
+          {{ invokeCycleTypeList[scope.row.invokeCycle] }}
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="created_at" label="周期次数" width="60">
+      <el-table-column align="center" prop="created_at" label="周期次数" width="50">
         <template slot-scope="scope">
           <span>{{ scope.row.invokeCycleTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column class-name="status-col" width="200" label="执行参数" align="center">
+      <el-table-column class-name="status-col" width="150" label="执行参数" align="center">
         <template slot-scope="scope">
           {{ scope.row.invokeParams }}
         </template>
       </el-table-column>
-      <el-table-column label="执行类型名称" width="120" align="center">
+      <el-table-column label="执行类型方法" width="50" align="center">
         <template slot-scope="scope">
           {{ scope.row.invokeMethod }}
         </template>
       </el-table-column>
-      <el-table-column label="异常次数（超过10次自动挂起）" width="100" align="center">
+      <el-table-column label="异常次数" width="50" align="center" :render-header="(h, obj) => renderHeaderTip(h, obj, '超过10次自动挂起')">
         <template slot-scope="scope">
           {{ scope.row.runCount }}
         </template>
@@ -120,9 +127,9 @@
           <el-input v-model="temp.name" />
         </el-form-item>
         <el-form-item label="调度类型编号" prop="type">
-          <el-select v-model="temp.invokeCode" >
+          <el-select v-model="temp.invokeCode" placeholder="请选择">
             <el-option
-              v-for="item in invokeTypeList"
+               v-for="item in invokeTypeList"
               :key="item.invokeCode"
               :label="item.name"
               :value="item.invokeCode">
@@ -130,7 +137,14 @@
           </el-select>
         </el-form-item>
         <el-form-item label="调度周期" prop="type">
-          <el-input v-model="temp.invokeCycle" />
+          <el-select v-model="temp.invokeCycle" placeholder="请选择">
+            <el-option
+               v-for="item in Object.keys(invokeCycleTypeList)"
+              :key="item"
+              :label="invokeCycleTypeList[item]"
+              :value="item">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="调度周期次数" prop="type">
           <el-input v-model="temp.invokeCycleTime" />
@@ -145,7 +159,7 @@
           <el-input v-model="temp.invokeMethod" />
         </el-form-item>
         <el-form-item label="执行次数" prop="type">
-          <el-input v-model="temp.runCount" />
+          <el-input v-model="temp.runCount" oninput="value=value.replace(/[^0-9]/g,'')" />
         </el-form-item>
         <el-form-item label="异常信息" prop="type">
           <el-input v-model="temp.exMsg" />
@@ -164,9 +178,10 @@
 </template>
 
 <script>
-import { get_collection_policy_page_result, update_policy, insert_policy, get_invoke_type_page_result } from '@/api/quantization/settings'
+import { get_invoke_type_page_result, get_base_data_item_map } from '@/api/quantization/settings'
+import { get_collection_policy_page_result, update_policy, insert_policy, get_policy } from '@/api/quantization/collection_policy'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import { parseTime } from '@/utils/index.js'
+import { parseTime, renderHeaderTip } from '@/utils/index.js'
 import waves from '@/directive/waves' // waves directive
 
 const isExpetionOptions = [
@@ -193,6 +208,8 @@ export default {
       list: null,
       total: 0,
       invokeTypeList: [],
+      baseDataItemMapType: ['invokeCycleType'],
+      invokeCycleTypeList: {},
       listQuery: {
         name: undefined,
         policyId: undefined,
@@ -209,7 +226,7 @@ export default {
         invokeCycle: undefined,
         preRunTime: undefined,
         invokeParams: undefined,
-        runCount: undefined,
+        runCount: 0,
         invokeCycleTime: undefined,
         exMsg: undefined,
         invokeMethod: undefined
@@ -221,6 +238,9 @@ export default {
     this.getList()
     get_invoke_type_page_result({ pageIndex: 1, pageSize: 100 }).then(response => {
       this.invokeTypeList = response.data === null ? [] : response.data.result
+    })
+    get_base_data_item_map({ queryTypeList: this.baseDataItemMapType }).then(response => {
+      this.invokeCycleTypeList = response.data === null ? {} : response.data.queryTypeResult['invokeCycleType'.toLowerCase()]
     })
   },
   methods: {
@@ -246,17 +266,20 @@ export default {
     },
     editDataDialog(row) {
       this.dialogStatus = 'update'
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.preRunTime = parseTime(new Date(row.preRunTime), '{y}-{m}-{d} {h}:{i}:{s}')
-      this.dialogFormVisible = true
+      get_policy({ policyId: row.policyId }).then(response => {
+        this.temp = Object.assign({}, response.data === null ? row : response.data) // copy obj
+        this.temp.preRunTime = parseTime(new Date(row.preRunTime), '{y}-{m}-{d} {h}:{i}:{s}')
+        this.dialogFormVisible = true
+      })
     },
     addDataDialog(row) {
       this.dialogStatus = 'add'
-      this.temp = Object.assign({}, row) // copy obj
+      // this.temp = Object.assign({}, row) // copy obj
       // this.temp.NextRunTime = ''
       this.dialogFormVisible = true
     },
-    parseTime: parseTime
+    parseTime: parseTime,
+    renderHeaderTip: renderHeaderTip
   }
 }
 </script>

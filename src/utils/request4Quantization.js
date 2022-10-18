@@ -59,7 +59,8 @@ service.interceptors.response.use(
       Message({
         message: res.desc || 'Error',
         type: 'error',
-        duration: 5 * 1000
+        duration: 5 * 1000,
+        customClass: 'messageIndex'
       })
 
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
@@ -81,7 +82,8 @@ service.interceptors.response.use(
         Message({
           message: res.desc || '请求成功！',
           type: 'success',
-          duration: 2 * 1000
+          duration: 2 * 1000,
+          customClass: 'messageIndex'
         })
       }
       return res
@@ -95,7 +97,8 @@ service.interceptors.response.use(
     Message({
       message: error.message,
       type: 'error',
-      duration: 5 * 1000
+      duration: 5 * 1000,
+      customClass: 'messageIndex'
     })
     return Promise.reject(error)
   }

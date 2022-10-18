@@ -115,3 +115,34 @@ export function param2Obj(url) {
   })
   return obj
 }
+// 列表表头tip渲染方法
+export function renderHeaderTip(h, { column }, text, placement, iconClass) {
+  const tipContent = [
+    h(
+      'div',
+      {
+        slot: 'content',
+        style: 'margin:3px'
+      },
+      text || '提示'
+    )
+  ]
+  return h('div', [
+    h('span', column.label),
+    h(
+      'el-tooltip',
+      {
+        props: {
+          placement: placement || 'top'
+        }
+      },
+      [
+        tipContent,
+        h('i', {
+          class: iconClass || 'el-icon-warning-outline',
+          style: 'color:orange;margin-left:5px;cursor:pointer;'
+        })
+      ]
+    )
+  ])
+}
