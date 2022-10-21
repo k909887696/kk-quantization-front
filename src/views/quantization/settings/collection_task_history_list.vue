@@ -17,13 +17,13 @@
         <el-row>
           <el-form-item label="调度类型:">
             <el-select v-model="listQuery.invokeCode" style="width: 200px;" placeholder="请选择">
-            <el-option
-               v-for="item in invokeTypeList"
-              :key="item.invokeCode"
-              :label="item.name"
-              :value="item.invokeCode">
-            </el-option>
-          </el-select>
+              <el-option
+                v-for="item in invokeTypeList"
+                :key="item.invokeCode"
+                :label="item.name"
+                :value="item.invokeCode"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="是否异常:">
             <el-select v-model="listQuery.IsExpetion" placeholder="是否异常" clearable class="filter-item" style="width: 200px">
@@ -52,39 +52,29 @@
       highlight-current-row
       style="width: 100%;"
     >
+      <el-table-column align="center" label="任务编号" width="150">
+        <template slot-scope="scope">
+          {{ scope.row.taskId }}
+        </template>
+      </el-table-column>
+      <el-table-column label="任务名称" width="220">
+        <template slot-scope="scope">
+          {{ scope.row.name }}
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="策略编号" width="150">
         <template slot-scope="scope">
           {{ scope.row.policyId }}
         </template>
       </el-table-column>
-      <el-table-column label="策略名称" width="220">
-        <template slot-scope="scope">
-          {{ scope.row.name }}
-        </template>
-      </el-table-column>
-      <el-table-column label="执行类型编号" width="150" align="center">
+      <el-table-column label="执行类型" width="150" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.invokeCode }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="执行周期" width="50" align="center">
-        <template slot-scope="scope">
-          {{ invokeCycleTypeList[scope.row.invokeCycle] }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" prop="created_at" label="周期次数" width="50">
-        <template slot-scope="scope">
-          <span>{{ scope.row.invokeCycleTime }}</span>
         </template>
       </el-table-column>
       <el-table-column class-name="status-col" width="150" label="执行参数" align="center">
         <template slot-scope="scope">
           {{ scope.row.invokeParams }}
-        </template>
-      </el-table-column>
-      <el-table-column label="执行类型方法" width="50" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.invokeMethod }}
         </template>
       </el-table-column>
       <el-table-column label="异常次数" width="50" align="center" :render-header="(h, obj) => renderHeaderTip(h, obj, '超过10次自动挂起')">
@@ -97,6 +87,18 @@
           {{ scope.row.exMsg }}
         </template>
       </el-table-column>
+      <el-table-column align="center" label="执行时间" width="110">
+        <template slot-scope="scope">
+          <i class="el-icon-time" />
+          <span>{{ parseTime(new Date(scope.row.runTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="完成时间" width="110">
+        <template slot-scope="scope">
+          <i class="el-icon-time" />
+          <span>{{ parseTime(new Date(scope.row.finishTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="预定执行时间" width="110">
         <template slot-scope="scope">
           <i class="el-icon-time" />
@@ -107,13 +109,6 @@
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ parseTime(new Date(scope.row.createTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="" align="center" width="100" class-name="small-padding fixed-width">
-        <template slot-scope="{row}">
-          <el-button type="primary" icon="el-icon-edit" size="mini" @click="editDataDialog(row)">
-            Edit
-          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -129,21 +124,21 @@
         <el-form-item label="调度类型编号" prop="type">
           <el-select v-model="temp.invokeCode" placeholder="请选择">
             <el-option
-               v-for="item in invokeTypeList"
+              v-for="item in invokeTypeList"
               :key="item.invokeCode"
               :label="item.name"
-              :value="item.invokeCode">
-            </el-option>
+              :value="item.invokeCode"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="调度周期" prop="type">
           <el-select v-model="temp.invokeCycle" placeholder="请选择">
             <el-option
-               v-for="item in Object.keys(invokeCycleTypeList)"
+              v-for="item in Object.keys(invokeCycleTypeList)"
               :key="item"
               :label="invokeCycleTypeList[item]"
-              :value="item">
-            </el-option>
+              :value="item"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="调度周期次数" prop="type">
@@ -179,7 +174,7 @@
 
 <script>
 import { get_invoke_type_page_result, get_base_data_item_map } from '@/api/quantization/settings'
-import { get_collection_policy_page_result, update_policy, insert_policy, get_policy } from '@/api/quantization/collection_policy'
+import { get_collection_task_history_page_result, update_policy, insert_policy, get_policy } from '@/api/quantization/collection_task'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { parseTime, renderHeaderTip } from '@/utils/index.js'
 import waves from '@/directive/waves' // waves directive
@@ -245,7 +240,7 @@ export default {
   },
   methods: {
     getList() {
-      get_collection_policy_page_result(this.listQuery).then(response => {
+      get_collection_task_history_page_result(this.listQuery).then(response => {
         this.list = response.data === null ? [] : response.data.result
         this.total = response.data === null ? 0 : response.data.totalCount
       })

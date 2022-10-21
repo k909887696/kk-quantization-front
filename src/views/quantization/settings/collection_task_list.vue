@@ -17,13 +17,13 @@
         <el-row>
           <el-form-item label="调度类型:">
             <el-select v-model="listQuery.invokeCode" style="width: 200px;" placeholder="请选择">
-            <el-option
-               v-for="item in invokeTypeList"
-              :key="item.invokeCode"
-              :label="item.name"
-              :value="item.invokeCode">
-            </el-option>
-          </el-select>
+              <el-option
+                v-for="item in invokeTypeList"
+                :key="item.invokeCode"
+                :label="item.name"
+                :value="item.invokeCode"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="是否异常:">
             <el-select v-model="listQuery.IsExpetion" placeholder="是否异常" clearable class="filter-item" style="width: 200px">
@@ -129,21 +129,21 @@
         <el-form-item label="调度类型编号" prop="type">
           <el-select v-model="temp.invokeCode" placeholder="请选择">
             <el-option
-               v-for="item in invokeTypeList"
+              v-for="item in invokeTypeList"
               :key="item.invokeCode"
               :label="item.name"
-              :value="item.invokeCode">
-            </el-option>
+              :value="item.invokeCode"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="调度周期" prop="type">
           <el-select v-model="temp.invokeCycle" placeholder="请选择">
             <el-option
-               v-for="item in Object.keys(invokeCycleTypeList)"
+              v-for="item in Object.keys(invokeCycleTypeList)"
               :key="item"
               :label="invokeCycleTypeList[item]"
-              :value="item">
-            </el-option>
+              :value="item"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="调度周期次数" prop="type">

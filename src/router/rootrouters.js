@@ -271,18 +271,29 @@ const constantRoutes = [
     ]
   },
   {
-    path: '/form',
+    path: '/gantt-elastic',
     component: Layout,
     children: [
       {
         path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
+        name: 'gantt-elastic',
+        component: () => import('@/views/table/gantt-elastic'),
+        meta: { title: 'gantt-elastic', icon: 'form' }
       }
     ]
   },
-
+  {
+    path: '/gstc',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'gstc',
+        component: () => import('@/views/table/gstc'),
+        meta: { title: 'gstc', icon: 'form' }
+      }
+    ]
+  },
   {
     path: '/nested',
     component: Layout,
