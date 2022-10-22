@@ -1,7 +1,40 @@
 /**
  * Created by PanJiaChen on 16/11/18.
  */
-
+export function addTime(dateTime, times, dateTimeType) {
+  const currentDate = dateTime || new Date()
+  times = times || 0
+  dateTimeType = dateTimeType || 'sec'
+  // const timeStamp = currentDate.getTime()
+  let currentYear = currentDate.getFullYear()
+  let currentMonth = currentDate.getMonth()
+  let currentDay = currentDate.getDate()
+  let currentHour = currentDate.getHours()
+  let currentMin = currentDate.getMinutes()
+  let currentSec = currentDate.getSeconds()
+  if (dateTimeType === 'sec') {
+    currentSec += times
+  } else if (dateTimeType === 'min') {
+    currentMin += times
+  } else if (dateTimeType === 'hour') {
+    currentHour += times
+  } else if (dateTimeType === 'day') {
+    currentDay += times
+  } else if (dateTimeType === 'month') {
+    currentMonth += times
+  } else if (dateTimeType === 'year') {
+    currentYear += times
+  }
+  const timeStampRes = new Date(
+    currentYear,
+    currentMonth,
+    currentDay,
+    currentHour,
+    currentMin,
+    currentSec
+  ).getTime()
+  return timeStampRes
+}
 /**
  * Parse the time to string
  * @param {(Object|string|number)} time

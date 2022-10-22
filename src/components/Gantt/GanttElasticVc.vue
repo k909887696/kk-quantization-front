@@ -9,8 +9,6 @@
     >
       <gantt-header :options="options" slot="header" />
     </gantt-elastic>
-    <div class="q-mt-md" />
-    <el-button type="" @click="addTask">Add task</el-button>
   </div>
 </template>
 
@@ -169,8 +167,13 @@ export default {
     }
   },
   computed: {
-    'tempTasks'() {
-      return this.tasks
+    tempTasks: {
+      get() {
+        return this.tasks
+      },
+      set(v) {
+        this.tasks = v
+      }
     }
   },
   methods: {

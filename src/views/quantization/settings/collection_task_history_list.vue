@@ -52,6 +52,9 @@
       highlight-current-row
       style="width: 100%;"
     >
+      <template slot="empty">
+        {{ empty_tip }}
+      </template>
       <el-table-column align="center" label="任务编号" width="150">
         <template slot-scope="scope">
           {{ scope.row.taskId }}
@@ -178,7 +181,7 @@ import { get_collection_task_history_page_result, update_policy, insert_policy, 
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { parseTime, renderHeaderTip } from '@/utils/index.js'
 import waves from '@/directive/waves' // waves directive
-
+import config from '@/config'
 const isExpetionOptions = [
   { key: -1, display_name: '不限' },
   { key: 0, display_name: '异常' },
@@ -200,6 +203,7 @@ export default {
   },
   data() {
     return {
+      empty_tip: config.table_list_empty_tip,
       list: null,
       total: 0,
       invokeTypeList: [],

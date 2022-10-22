@@ -47,11 +47,12 @@ import { parseTime, addTime } from '@/utils/index.js'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import waves from '@/directive/waves' // waves directive
 import store from '@/store'
+import config from '@/config'
 // just helper to get current dates
 const tasks = [
   {
     id: 1,
-    label: '没有数据',
+    label: config.table_list_empty_tip,
     user: '',
     start: new Date(),
     end: addTime(new Date(), 1, 'day'),

@@ -277,8 +277,8 @@ const constantRoutes = [
       {
         path: 'index',
         name: 'gantt-elastic',
-        component: () => import('@/views/table/gantt-elastic'),
-        meta: { title: 'gantt-elastic', icon: 'form' }
+        component: () => import('@/views/meiya/project_manage/project_gantt'),
+        meta: { title: '项目甘特表', icon: 'el-icon-date' }
       }
     ]
   },

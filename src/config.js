@@ -1,5 +1,6 @@
 const config = {
   quantization_api_url: process.env.VUE_APP_QUANTIZATION_API_URL,
+  table_list_empty_tip: '删库跑路了,很急,在线等！！！',
   meiya_report_api_url: process.env.VUE_APP_MEIYA_REPORT_API_URL,
   meiya_tmcjurisdiction_api_url: process.env.VUE_APP_MEIYA_TMCJURISDICTION_API_URL,
   meiya_maintenanceplatform_api_url: process.env.VUE_APP_MEIYA_MAINTENANCEPLATFORM_API_URL,

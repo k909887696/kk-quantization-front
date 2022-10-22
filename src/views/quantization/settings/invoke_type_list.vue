@@ -23,6 +23,9 @@
       fit
       highlight-current-row
     >
+      <template slot="empty">
+        {{ empty_tip }}
+      </template>
       <el-table-column align="center" label="调度类型编号(注入bean id)" width="250">
         <template slot-scope="scope">
           {{ scope.row.invokeCode }}
@@ -64,6 +67,7 @@ import { get_invoke_type_page_result } from '@/api/quantization/settings'
 import { parseTime } from '@/utils/index.js'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import waves from '@/directive/waves' // waves directive
+import config from '@/config'
 export default {
   components: { Pagination },
   directives: { waves },
@@ -79,6 +83,7 @@ export default {
   },
   data() {
     return {
+      empty_tip: config.table_list_empty_tip,
       list: null,
       total: 0,
       listQuery: {
