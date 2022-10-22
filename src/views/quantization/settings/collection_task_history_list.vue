@@ -6,8 +6,21 @@
           <el-form-item label="策略编号:">
             <el-input v-model="listQuery.PolicyId" placeholder="策略编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-form-item>
-          <el-form-item label="策略名称:">
-            <el-input v-model="listQuery.Name" placeholder="策略名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+          <el-form-item label="策略:">
+            <el-select
+              v-model="listQuery.policyId"
+              filterable
+              remote
+              reserve-keyword
+              placeholder="请输入关键词"
+              :remote-method="get_collection_policy_page_result_4_select"
+              :loading="collectionPolicyListLoading">
+              <el-option
+                v-for="item in collectionPolicyList"
+                :key="item.policyId"
+                :label="item.name"
+                :value="item.policyId" />
+            </el-select>
           </el-form-item>
           <el-form-item label="预定执行时间:">
             <el-date-picker v-model="listQuery.StartRunTime" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" /> -
@@ -16,7 +29,7 @@
         </el-row>
         <el-row>
           <el-form-item label="调度类型:">
-            <el-select v-model="listQuery.invokeCode" style="width: 200px;" placeholder="请选择">
+            <el-select v-model="listQuery.invokeCode" filterable style="width: 200px;" placeholder="请选择">
               <el-option
                 v-for="item in invokeTypeList"
                 :key="item.invokeCode"
@@ -60,7 +73,7 @@
           {{ scope.row.taskId }}
         </template>
       </el-table-column>
-      <el-table-column label="任务名称" width="220">
+      <el-table-column label="任务名称">
         <template slot-scope="scope">
           {{ scope.row.name }}
         </template>
@@ -77,7 +90,15 @@
       </el-table-column>
       <el-table-column class-name="status-col" width="150" label="执行参数" align="center">
         <template slot-scope="scope">
-          {{ scope.row.invokeParams }}
+          <el-popover
+            placement="left"
+            title="参数"
+            width="300"
+            trigger="click"
+            :content="scope.row.invokeParams">
+            <el-button slot="reference">查看</el-button>
+          </el-popover>
+
         </template>
       </el-table-column>
       <el-table-column label="异常次数" width="50" align="center" :render-header="(h, obj) => renderHeaderTip(h, obj, '超过10次自动挂起')">
@@ -85,9 +106,16 @@
           {{ scope.row.runCount }}
         </template>
       </el-table-column>
-      <el-table-column label="异常信息" align="center">
+      <el-table-column label="异常信息" align="center" width="150">
         <template slot-scope="scope">
-          {{ scope.row.exMsg }}
+          <el-popover
+            placement="right"
+            title="异常信息"
+            width="300"
+            trigger="click"
+            :content="scope.row.exMsg">
+            <el-button slot="reference">查看</el-button>
+          </el-popover>
         </template>
       </el-table-column>
       <el-table-column align="center" label="执行时间" width="110">
@@ -179,6 +207,7 @@
 import { get_invoke_type_page_result, get_base_data_item_map } from '@/api/quantization/settings'
 import { get_collection_task_history_page_result, update_policy, insert_policy, get_policy } from '@/api/quantization/collection_task'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { get_collection_policy_page_result } from '@/api/quantization/collection_policy'
 import { parseTime, renderHeaderTip } from '@/utils/index.js'
 import waves from '@/directive/waves' // waves directive
 import config from '@/config'
@@ -209,6 +238,8 @@ export default {
       invokeTypeList: [],
       baseDataItemMapType: ['invokeCycleType'],
       invokeCycleTypeList: {},
+      collectionPolicyList: [],
+      collectionPolicyListLoading: false,
       listQuery: {
         name: undefined,
         policyId: undefined,
@@ -247,6 +278,13 @@ export default {
       get_collection_task_history_page_result(this.listQuery).then(response => {
         this.list = response.data === null ? [] : response.data.result
         this.total = response.data === null ? 0 : response.data.totalCount
+      })
+    },
+    get_collection_policy_page_result_4_select(keyword) {
+      this.collectionPolicyListLoading = true
+      get_collection_policy_page_result({ name: keyword, pageIndex: 1, pageSize: 10 }, false, false).then(response => {
+        this.collectionPolicyListLoading = false
+        this.collectionPolicyList = response.data === null ? [] : response.data.result
       })
     },
     updateData() {

@@ -1,12 +1,13 @@
 import request from '@/utils/request4Quantization'
 import config from '@/config'
 
-export function get_collection_policy_page_result(params, isLoading) {
+export function get_collection_policy_page_result(params, isLoading, isPrompt) {
   return request({
     url: config.quantization_api_url + '/quantization/api/v1/collection_policy/get_collection_policy_page_result',
     method: 'post',
     data: params,
-    isLoading
+    isLoading: isLoading,
+    isPrompt
   })
 }
 
