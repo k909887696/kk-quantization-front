@@ -16,7 +16,7 @@
         </el-row>
         <el-row>
           <el-form-item label="调度类型:">
-            <el-select v-model="listQuery.invokeCode" style="width: 200px;" placeholder="请选择">
+            <el-select v-model="listQuery.invokeCode" filterable style="width: 200px;" placeholder="请选择">
             <el-option
                v-for="item in invokeTypeList"
               :key="item.invokeCode"
@@ -279,8 +279,8 @@ export default {
     },
     addDataDialog(row) {
       this.dialogStatus = 'add'
-      // this.temp = Object.assign({}, row) // copy obj
-      // this.temp.NextRunTime = ''
+      this.temp = Object.assign({}, row) // copy obj
+      this.temp.runCount = 0
       this.dialogFormVisible = true
     },
     parseTime: parseTime,

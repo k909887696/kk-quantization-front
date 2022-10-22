@@ -3,18 +3,15 @@
     <div class="filter-container">
       <el-form :inline="true" label-width="110px" label-position="right">
         <el-row>
+          <el-form-item label="任务编号:">
+            <el-input v-model="listQuery.taskId" placeholder="任务编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+          </el-form-item>
+          <el-form-item label="任务名称:">
+            <el-input v-model="listQuery.Name" placeholder="任务名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+          </el-form-item>
           <el-form-item label="策略编号:">
             <el-input v-model="listQuery.PolicyId" placeholder="策略编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-form-item>
-          <el-form-item label="策略名称:">
-            <el-input v-model="listQuery.Name" placeholder="策略名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-          </el-form-item>
-          <el-form-item label="预定执行时间:">
-            <el-date-picker v-model="listQuery.StartRunTime" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" /> -
-            <el-date-picker v-model="listQuery.EndRunTime" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" />
-          </el-form-item>
-        </el-row>
-        <el-row>
           <el-form-item label="调度类型:">
             <el-select v-model="listQuery.invokeCode" style="width: 200px;" placeholder="请选择">
               <el-option
@@ -23,11 +20,6 @@
                 :label="item.name"
                 :value="item.invokeCode"
               />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="是否异常:">
-            <el-select v-model="listQuery.IsExpetion" placeholder="是否异常" clearable class="filter-item" style="width: 200px">
-              <el-option v-for="item in isExpetionOptions" :key="item.key" :label="item.display_name" :value="item.key" />
             </el-select>
           </el-form-item>
         </el-row>
@@ -53,41 +45,39 @@
       style="width: 100%;"
     >
       <template slot="empty">
-        {{ table_list_empty_tip }}
+        {{ empty_tip }}
       </template>
+      <el-table-column align="center" label="任务编号" width="150">
+        <template slot-scope="scope">
+          {{ scope.row.taskId }}
+        </template>
+      </el-table-column>
+      <el-table-column label="任务名称" width="220">
+        <template slot-scope="scope">
+          {{ scope.row.name }}
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="策略编号" width="150">
         <template slot-scope="scope">
           {{ scope.row.policyId }}
         </template>
       </el-table-column>
-      <el-table-column label="策略名称" width="220">
-        <template slot-scope="scope">
-          {{ scope.row.name }}
-        </template>
-      </el-table-column>
-      <el-table-column label="执行类型编号" width="150" align="center">
+      <el-table-column label="执行类型" width="150" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.invokeCode }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="执行周期" width="50" align="center">
-        <template slot-scope="scope">
-          {{ invokeCycleTypeList[scope.row.invokeCycle] }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" prop="created_at" label="周期次数" width="50">
-        <template slot-scope="scope">
-          <span>{{ scope.row.invokeCycleTime }}</span>
-        </template>
-      </el-table-column>
       <el-table-column class-name="status-col" width="150" label="执行参数" align="center">
         <template slot-scope="scope">
-          {{ scope.row.invokeParams }}
-        </template>
-      </el-table-column>
-      <el-table-column label="执行类型方法" width="50" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.invokeMethod }}
+          <el-popover
+            placement="left"
+            title="参数"
+            width="200"
+            trigger="click"
+            :content="scope.row.invokeParams">
+            <el-button slot="reference">查看</el-button>
+          </el-popover>
+
         </template>
       </el-table-column>
       <el-table-column label="异常次数" width="50" align="center" :render-header="(h, obj) => renderHeaderTip(h, obj, '超过10次自动挂起')">
@@ -97,7 +87,26 @@
       </el-table-column>
       <el-table-column label="异常信息" align="center">
         <template slot-scope="scope">
-          {{ scope.row.exMsg }}
+          <el-popover
+            placement="left"
+            title="异常信息"
+            width="200"
+            trigger="click"
+            :content="scope.row.exMsg">
+            <el-button slot="reference">查看</el-button>
+          </el-popover>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="执行时间" width="110">
+        <template slot-scope="scope">
+          <i class="el-icon-time" />
+          <span>{{ parseTime(new Date(scope.row.runTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="完成时间" width="110">
+        <template slot-scope="scope">
+          <i class="el-icon-time" />
+          <span>{{ parseTime(new Date(scope.row.finishTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="预定执行时间" width="110">
@@ -110,13 +119,6 @@
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ parseTime(new Date(scope.row.createTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="" align="center" width="100" class-name="small-padding fixed-width">
-        <template slot-scope="{row}">
-          <el-button type="primary" icon="el-icon-edit" size="mini" @click="editDataDialog(row)">
-            Edit
-          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -182,12 +184,11 @@
 
 <script>
 import { get_invoke_type_page_result, get_base_data_item_map } from '@/api/quantization/settings'
-import { get_collection_policy_page_result, update_policy, insert_policy, get_policy } from '@/api/quantization/collection_policy'
+import { get_collection_task_page_result, update_policy, insert_policy, get_policy } from '@/api/quantization/collection_task'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { parseTime, renderHeaderTip } from '@/utils/index.js'
 import waves from '@/directive/waves' // waves directive
 import config from '@/config'
-
 const isExpetionOptions = [
   { key: -1, display_name: '不限' },
   { key: 0, display_name: '异常' },
@@ -216,6 +217,7 @@ export default {
       baseDataItemMapType: ['invokeCycleType'],
       invokeCycleTypeList: {},
       listQuery: {
+        taskId: undefined,
         name: undefined,
         policyId: undefined,
         invokeCode: undefined,
@@ -250,7 +252,7 @@ export default {
   },
   methods: {
     getList() {
-      get_collection_policy_page_result(this.listQuery).then(response => {
+      get_collection_task_page_result(this.listQuery).then(response => {
         this.list = response.data === null ? [] : response.data.result
         this.total = response.data === null ? 0 : response.data.totalCount
       })
