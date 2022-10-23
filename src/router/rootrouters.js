@@ -50,6 +50,12 @@ const constantRoutes = [
             meta: { title: '交易日历', icon: 'el-icon-date', menus: 'menu_QuantizationBaseDataTradeCal', check_permission: false }
           },
           {
+            path: 'cnm',
+            name: 'QuantizationBaseDataCnM',
+            component: () => import('@/views/quantization/basedata/cn_m_list'),
+            meta: { title: '人民币总量', icon: 'el-icon-date', menus: 'menu_QuantizationBaseDataCnM', check_permission: false }
+          },
+          {
             path: 'stockbasic',
             name: 'QuantizationBaseDataStockBasic',
             component: () => import('@/views/tree/index'),

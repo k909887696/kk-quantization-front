@@ -60,24 +60,19 @@
           {{ scope.row.policyId }}
         </template>
       </el-table-column>
-      <el-table-column label="策略名称" width="220">
+      <el-table-column label="策略名称">
         <template slot-scope="scope">
           {{ scope.row.name }}
         </template>
       </el-table-column>
-      <el-table-column label="执行类型编号" width="150" align="center">
+      <el-table-column label="执行类型" width="250" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.invokeCode }}</span>
+          <span>{{ parseInvokeTypeName(scope.row.invokeCode) }}({{ (scope.row.invokeCode) }})</span>
         </template>
       </el-table-column>
-      <el-table-column label="执行周期" width="50" align="center">
+      <el-table-column label="执行周期" width="150" align="center">
         <template slot-scope="scope">
-          {{ invokeCycleTypeList[scope.row.invokeCycle] }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" prop="created_at" label="周期次数" width="50">
-        <template slot-scope="scope">
-          <span>{{ scope.row.invokeCycleTime }}</span>
+          每 {{ scope.row.invokeCycleTime }} {{ invokeCycleTypeList[scope.row.invokeCycle] }} 执行 1 次
         </template>
       </el-table-column>
       <el-table-column class-name="status-col" width="150" label="执行参数" align="center">
@@ -95,9 +90,16 @@
           {{ scope.row.runCount }}
         </template>
       </el-table-column>
-      <el-table-column label="异常信息" align="center">
+      <el-table-column label="异常信息" align="center" width="150">
         <template slot-scope="scope">
-          {{ scope.row.exMsg }}
+          <el-popover
+            placement="right"
+            title="异常信息"
+            width="300"
+            trigger="click"
+            :content="scope.row.exMsg">
+            <el-button slot="reference">查看</el-button>
+          </el-popover>
         </template>
       </el-table-column>
       <el-table-column align="center" label="预定执行时间" width="110">
@@ -240,13 +242,13 @@ export default {
     }
   },
   created() {
-    this.getList()
     get_invoke_type_page_result({ pageIndex: 1, pageSize: 100 }).then(response => {
       this.invokeTypeList = response.data === null ? [] : response.data.result
     })
     get_base_data_item_map({ queryTypeList: this.baseDataItemMapType }).then(response => {
       this.invokeCycleTypeList = response.data === null ? {} : response.data.queryTypeResult['invokeCycleType'.toLowerCase()]
     })
+    this.getList()
   },
   methods: {
     getList() {
@@ -282,6 +284,16 @@ export default {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.runCount = 0
       this.dialogFormVisible = true
+    },
+    parseInvokeTypeName(code) {
+      let invokeTypeName = ''
+      this.invokeTypeList.some(item => {
+        if (item.invokeCode === code) {
+          invokeTypeName = item.name
+          return true
+        }
+      })
+      return invokeTypeName
     },
     parseTime: parseTime,
     renderHeaderTip: renderHeaderTip

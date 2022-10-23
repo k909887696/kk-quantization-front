@@ -19,3 +19,12 @@ export function get_base_data_item_map(params, isLoading) {
     isPrompt: false
   })
 }
+
+export function get_serial_no_page_result(params, isLoading) {
+  return request({
+    url: config.quantization_api_url + '/quantization/api/v1/serial_no/get_serial_no_page_result',
+    method: 'post',
+    data: params,
+    isLoading
+  })
+}

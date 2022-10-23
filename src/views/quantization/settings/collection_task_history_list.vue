@@ -2,54 +2,9 @@
   <div class="app-container">
     <div class="filter-container">
       <el-form :inline="true" label-width="110px" label-position="right">
-        <el-row>
-          <el-form-item label="策略编号:">
-            <el-input v-model="listQuery.PolicyId" placeholder="策略编号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-          </el-form-item>
-          <el-form-item label="策略:">
-            <el-select
-              v-model="listQuery.policyId"
-              filterable
-              remote
-              reserve-keyword
-              placeholder="请输入关键词"
-              :remote-method="get_collection_policy_page_result_4_select"
-              :loading="collectionPolicyListLoading">
-              <el-option
-                v-for="item in collectionPolicyList"
-                :key="item.policyId"
-                :label="item.name"
-                :value="item.policyId" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="预定执行时间:">
-            <el-date-picker v-model="listQuery.StartRunTime" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" /> -
-            <el-date-picker v-model="listQuery.EndRunTime" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" />
-          </el-form-item>
-        </el-row>
-        <el-row>
-          <el-form-item label="调度类型:">
-            <el-select v-model="listQuery.invokeCode" filterable style="width: 200px;" placeholder="请选择">
-              <el-option
-                v-for="item in invokeTypeList"
-                :key="item.invokeCode"
-                :label="item.name"
-                :value="item.invokeCode"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="是否异常:">
-            <el-select v-model="listQuery.IsExpetion" placeholder="是否异常" clearable class="filter-item" style="width: 200px">
-              <el-option v-for="item in isExpetionOptions" :key="item.key" :label="item.display_name" :value="item.key" />
-            </el-select>
-          </el-form-item>
-        </el-row>
         <el-row justify="center" type="flex">
           <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="getList">
             查询
-          </el-button>
-          <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="addDataDialog">
-            添加
           </el-button>
           <el-button v-waves class="filter-item" type="primary" icon="el-icon-download" @click="getList">
             导出
