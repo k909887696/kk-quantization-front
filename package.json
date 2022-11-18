@@ -22,6 +22,7 @@
     "axios": "0.18.1",
     "core-js": "3.6.5",
     "dayjs": "^1.11.5",
+    "echarts": "^5.4.0",
     "element-ui": "2.13.2",
     "gantt-elastic": "^1.0.12",
     "gantt-elastic-header": "^0.1.11",

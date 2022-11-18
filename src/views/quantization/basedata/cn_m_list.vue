@@ -1,5 +1,15 @@
 <template>
   <div class="app-container">
+    <aside>
+    Creating and editing pages cannot be cached by keep-alive because keep-alive include does not currently support
+    caching based on routes, so it is currently cached based on component name. If you want to achieve a similar caching
+    effect, you can use a browser caching scheme such as localStorage. Or do not use keep-alive include to cache all
+    pages directly. See details
+    <a
+      href="https://panjiachen.github.io/vue-element-admin-site/guide/essentials/tags-view.html"
+      target="_blank"
+    >Document</a>
+  </aside>
     <div class="filter-container">
       <el-form :inline="true" label-width="110px" label-position="right">
         <el-row>
@@ -10,8 +20,8 @@
             <el-input v-model="listQuery.Name" placeholder="策略名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-form-item>
           <el-form-item label="预定执行时间:">
-            <el-date-picker v-model="listQuery.StartRunTime" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" /> -
-            <el-date-picker v-model="listQuery.EndRunTime" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" />
+            <el-date-picker v-model="listQuery.monthStart" type="date" format="yyyyMM" value-format="yyyyMM" style="width: 150px;" placeholder="选择时间" /> -
+            <el-date-picker v-model="listQuery.monthEnd" type="date" format="yyyyMM" value-format="yyyyMM" style="width: 150px;" placeholder="选择时间" />
           </el-form-item>
         </el-row>
         <el-row>
@@ -44,7 +54,7 @@
         </el-row>
       </el-form>
     </div>
-    <div id="echarts_box" style="width: 600px;height:400px;"></div>
+    <div id="echarts_box" style="height:400px;"></div>
     <el-dialog title="调度策略编辑" :visible.sync="dialogFormVisible" :close-on-click-modal="false" top="50px">
       <el-form ref="dataForm" :model="temp" label-position="right" label-width="110px" style="width: 400px; margin-left:50px;">
         <el-form-item label="策略编号" prop="type">
@@ -110,7 +120,7 @@ import Pagination from '@/components/Pagination' // secondary package based on e
 import { parseTime, renderHeaderTip } from '@/utils/index.js'
 import waves from '@/directive/waves' // waves directive
 import config from '@/config'
-import echarts from 'ehcarts'
+import * as echarts from 'echarts'
 const isExpetionOptions = [
   { key: -1, display_name: '不限' },
   { key: 0, display_name: '异常' },
@@ -139,11 +149,10 @@ export default {
       baseDataItemMapType: ['invokeCycleType'],
       invokeCycleTypeList: {},
       listQuery: {
-        name: undefined,
-        policyId: undefined,
-        invokeCode: undefined,
+        monthStart: undefined,
+        monthEnd: undefined,
         pageIndex: 1,
-        pageSize: 10
+        pageSize: 20
       },
       isExpetionOptions,
       dialogFormVisible: false,
@@ -175,23 +184,43 @@ export default {
   methods: {
     getList() {
       get_cn_m_page_result(this.listQuery).then(response => {
+        var xAxisData = []
+        var yAxisM0 = []
+        var yAxisM1 = []
+        var yAxisM2 = []
+        response.data.result.forEach(element => {
+          xAxisData.push(element.month)
+          yAxisM0.push(element.m0)
+          yAxisM1.push(element.m1)
+          yAxisM2.push(element.m2)
+        })
         // 4. 指定图表的配置项和数据
         var option = {
           title: {
-            text: '第一个 ECharts 实例'
+            text: '人民币总量'
           },
           tooltip: {},
           legend: {
-            data:['销量']
+            data: ['销量']
           },
           xAxis: {
-            data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
+            data: xAxisData
           },
           yAxis: {},
           series: [{
-            name: '销量',
-            ype: 'bar',
-            data: [5, 20, 36, 10, 10, 20]
+            name: 'M0',
+            type: 'bar',
+            data: yAxisM0
+          },
+          {
+            name: 'M1',
+            type: 'bar',
+            data: yAxisM1
+          },
+          {
+            name: 'M2',
+            type: 'bar',
+            data: yAxisM1
           }]
         }
         this.list = response.data === null ? [] : response.data.result
