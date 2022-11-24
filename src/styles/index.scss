@@ -79,3 +79,13 @@ div:focus {
   z-index: 9999 !important; // 设置的值一定要比2007大，因为dialog的层级是2007
 
 }
+
+.tip {
+  padding: 8px 16px;
+  background-color: #ecf8ff;
+  border-radius: 4px;
+  border-left: 5px solid #66b1ff;
+  margin: 20px 0;
+  color: #909399;
+  font-size: 14px;
+}
