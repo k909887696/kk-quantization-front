@@ -119,7 +119,7 @@
       <el-table-column align="center" label="完成时间" width="110">
         <template slot-scope="scope">
           <i class="el-icon-time" />
-          <span>{{ parseTime(new Date(scope.row.finishTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+          <span>{{ scope.row.finishTime ===null ? '' : parseTime(new Date(scope.row.finishTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="预定执行时间" width="110">
