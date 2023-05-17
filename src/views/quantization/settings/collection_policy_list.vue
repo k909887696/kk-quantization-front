@@ -114,10 +114,13 @@
           <span>{{ parseTime(new Date(scope.row.createTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="" align="center" width="100" class-name="small-padding fixed-width">
+      <el-table-column label="" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" icon="el-icon-edit" size="mini" @click="editDataDialog(row)">
-            Edit
+            编辑
+          </el-button>
+          <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteData(row)">
+            删除
           </el-button>
         </template>
       </el-table-column>
@@ -269,6 +272,20 @@ export default {
       insert_policy(this.temp).then(response => {
         this.dialogFormVisible = false
         this.getList()
+      })
+    },
+    deleteData() {
+      this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.getList()
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除!'
+        })
       })
     },
     editDataDialog(row) {

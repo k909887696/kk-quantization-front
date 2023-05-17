@@ -64,7 +64,7 @@ const constantRoutes = [
           {
             path: 'daily',
             name: 'QuantizationBaseDataDaily',
-            component: () => import('@/views/tree/index'),
+            component: () => import('@/views/quantization/basedata/daily_list'),
             meta: { title: '个股日线行情', icon: 'el-icon-data-line', menus: 'menu_QuantizationBaseDataDaily', check_permission: false }
           },
           {

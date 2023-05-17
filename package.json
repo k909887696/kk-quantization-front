@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve",
     "test": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve --mode test",
+    "devmeiya": "vue-cli-service serve --mode devmeiya",
+    "testmeiya": "vue-cli-service serve --mode testmeiya",
     "hg": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve --mode hg",
     "prod": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve --mode prod",
     "build:prod": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build",
