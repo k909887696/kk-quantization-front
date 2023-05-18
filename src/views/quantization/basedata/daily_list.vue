@@ -186,7 +186,7 @@
 // import { get_base_data_item_map } from '@/api/quantization/settings'
 import { get_daily_page_list, deleteById, insert, update, get_details } from '@/api/quantization/daily_api'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import { parseTime, renderHeaderTip } from '@/utils/index.js'
+import { parseTime, renderHeaderTip,addTime } from '@/utils/index.js'
 import waves from '@/directive/waves' // waves directive
 import config from '@/config'
 export default {
@@ -234,6 +234,7 @@ export default {
     }
   },
   created() { // 初始化界面
+    this.listQuery.tradeDateStart = (parseTime(addTime(new Date(), -2, 'month'), '{y}{m}{d}'))
     this.getPageList()
   },
   methods: {

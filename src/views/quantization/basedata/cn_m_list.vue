@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { get_cn_m_page_list } from '@/api/quantization/cn_m'
+import { get_cn_m_page_list } from '@/api/quantization/cn_m_api'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { parseTime, renderHeaderTip, addTime } from '@/utils/index.js'
 import waves from '@/directive/waves' // waves directive

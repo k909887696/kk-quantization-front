@@ -44,10 +44,10 @@ const constantRoutes = [
         meta: { title: '基础数据', icon: 'table', menus: 'menu_quantization_basedata', check_permission: false },
         children: [
           {
-            path: 'tradecal_list',
-            name: 'quantization_basedata_tradecal_list',
-            component: () => import('@/views/table/index'),
-            meta: { title: '交易日历', icon: 'el-icon-date', menus: 'menu_quantization_basedata_tradecal_list', check_permission: false }
+            path: 'trade_cal_list',
+            name: 'quantization_trade_cal_list',
+            component: () => import('@/views/quantization/basedata/trade_cal_list'),
+            meta: { title: '交易日历', icon: 'el-icon-date', menus: 'menu_quantization_trade_cal_list', check_permission: false }
           },
           {
             path: 'cn_m_list',
@@ -56,10 +56,10 @@ const constantRoutes = [
             meta: { title: '人民币总量', icon: 'el-icon-date', menus: 'menu_quantization_basedata_cn_m_list', check_permission: false }
           },
           {
-            path: 'stockbasic',
-            name: 'QuantizationBaseDataStockBasic',
-            component: () => import('@/views/tree/index'),
-            meta: { title: '股票列表', icon: 'table', menus: 'menu_QuantizationBaseDataStockBasic', check_permission: false }
+            path: 'stock_basic_list',
+            name: 'quantization_stock_basic_list',
+            component: () => import('@/views/quantization/basedata/stock_basic_list'),
+            meta: { title: '个股基本信息	', icon: 'el-icon-date', menus: 'menu_quantization_stock_basic_list', check_permission: false }
           },
           {
             path: 'daily_list',
@@ -68,10 +68,28 @@ const constantRoutes = [
             meta: { title: '个股日线行情', icon: 'el-icon-data-line', menus: 'menu_quantization_basedata_daily_list', check_permission: false }
           },
           {
-            path: 'concept',
-            name: 'QuantizationBaseDataConcept',
-            component: () => import('@/views/tree/index'),
-            meta: { title: '概念分类', icon: 'nested', menus: 'menu_QuantizationBaseDataConcept', check_permission: false }
+            path: 'concept_list',
+            name: 'quantization_concept_list',
+            component: () => import('@/views/quantization/basedata/concept_list'),
+            meta: { title: '概念分类	', icon: 'el-icon-date', menus: 'menu_quantization_concept_list', check_permission: false }
+          },
+          {
+            path: 'concept_detail_list',
+            name: 'quantization_concept_detail_list',
+            component: () => import('@/views/quantization/basedata/concept_detail_list'),
+            meta: { title: '概念明细', icon: 'el-icon-date', menus: 'menu_quantization_concept_detail_list', check_permission: false }
+          },
+          {
+            path: 'concept_daily_list',
+            name: 'quantization_concept_daily_list',
+            component: () => import('@/views/quantization/basedata/concept_daily_list'),
+            meta: { title: '概念日线行情	', icon: 'el-icon-date', menus: 'menu_quantization_concept_daily_list', check_permission: false }
+          },
+          {
+            path: 'concept_money_flow_list',
+            name: 'quantization_concept_money_flow_list',
+            component: () => import('@/views/quantization/basedata/concept_money_flow_list'),
+            meta: { title: '概念资金流向	', icon: 'el-icon-date', menus: 'menu_quantization_concept_money_flow_list', check_permission: false }
           },
           {
             path: 'index',
