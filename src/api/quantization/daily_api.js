@@ -19,7 +19,7 @@ export function get_daily_page_list(params, isLoading) {
 // 删除
 export function deleteById(params, isLoading) {
   return request({
-    url: config.quantization_api_url + '/quantization/api/v1/daily/delete',
+    url: config.quantization_api_url + '/quantization/api/v1/daily/delete_by_id',
     method: 'post',
     data: params,
     isLoading

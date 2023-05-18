@@ -7,7 +7,7 @@
             <el-input v-model="listQuery.tsCode" placeholder="股票代码" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-form-item>
           <el-form-item label="交易日期:">
-            <el-date-picker v-model="listQuery.tradeDateStart" type="date" format="yyyyMM-dd" value-format="yyyyMMdd" style="width: 150px;" placeholder="选择时间" /> -
+            <el-date-picker v-model="listQuery.tradeDateStart" type="date" format="yyyyMMdd" value-format="yyyyMMdd" style="width: 150px;" placeholder="选择时间" /> -
             <el-date-picker v-model="listQuery.tradeDateEnd" type="date" format="yyyyMMdd" value-format="yyyyMMdd" style="width: 150px;" placeholder="选择时间" />
           </el-form-item>
           <el-form-item label="开盘价:">
@@ -121,7 +121,7 @@
           {{ scope.row.amount }}
         </template>
       </el-table-column>
-      <el-table-column label="" align="center" width="200" class-name="small-padding fixed-width">
+      <el-table-column label="" align="center" width="200" class-name="small-padding fixed-width" fixed="right">
         <template slot-scope="{row}">
           <el-button type="primary" icon="el-icon-edit" size="mini" @click="editDataDialog(row)">
             编辑
@@ -140,6 +140,33 @@
         </el-form-item>
         <el-form-item label="交易日期" prop="type">
           <el-input v-model="temp.tradeDate" readonly disabled />
+        </el-form-item>
+        <el-form-item label="开盘价" prop="type">
+          <el-input v-model="temp.open"   />
+        </el-form-item>
+        <el-form-item label="最高价" prop="type">
+          <el-input v-model="temp.high"   />
+        </el-form-item>
+        <el-form-item label="最低价" prop="type">
+          <el-input v-model="temp.low"   />
+        </el-form-item>
+        <el-form-item label="收盘价" prop="type">
+          <el-input v-model="temp.close"   />
+        </el-form-item>
+        <el-form-item label="上一日收盘价" prop="type">
+          <el-input v-model="temp.preClose"   />
+        </el-form-item>
+        <el-form-item label="涨跌额" prop="type">
+          <el-input v-model="temp.change"   />
+        </el-form-item>
+        <el-form-item label="涨跌幅%" prop="type">
+          <el-input v-model="temp.pctChg"   />
+        </el-form-item>
+        <el-form-item label="成交额" prop="type">
+          <el-input v-model="temp.vol"   />
+        </el-form-item>
+        <el-form-item label="成交量" prop="type">
+          <el-input v-model="temp.amount"   />
         </el-form-item>
 
       </el-form>

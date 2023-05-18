@@ -34,26 +34,26 @@ const constantRoutes = [
   {
     path: '/quantization',
     component: Layout,
-    name: 'Quantization',
-    meta: { title: 'quantization', icon: 'el-icon-data-analysis', menus: 'menu_Quantization', check_permission: false },
+    name: 'quantization',
+    meta: { title: 'quantization', icon: 'el-icon-data-analysis', menus: 'menu_quantization', check_permission: false },
     children: [
       {
         path: 'basedata',
-        name: 'QuantizationBaseData',
+        name: 'quantization_basedata',
         component: () => import('@/layout/components/MultiLevelMenu'),
-        meta: { title: '基础数据', icon: 'table', menus: 'menu_QuantizationBaseData', check_permission: false },
+        meta: { title: '基础数据', icon: 'table', menus: 'menu_quantization_basedata', check_permission: false },
         children: [
           {
-            path: 'tradecal',
-            name: 'QuantizationBaseDataTradeCal',
+            path: 'tradecal_list',
+            name: 'quantization_basedata_tradecal_list',
             component: () => import('@/views/table/index'),
-            meta: { title: '交易日历', icon: 'el-icon-date', menus: 'menu_QuantizationBaseDataTradeCal', check_permission: false }
+            meta: { title: '交易日历', icon: 'el-icon-date', menus: 'menu_quantization_basedata_tradecal_list', check_permission: false }
           },
           {
-            path: 'cnm',
-            name: 'QuantizationBaseDataCnM',
+            path: 'cn_m_list',
+            name: 'quantization_basedata_cn_m_list',
             component: () => import('@/views/quantization/basedata/cn_m_list'),
-            meta: { title: '人民币总量', icon: 'el-icon-date', menus: 'menu_QuantizationBaseDataCnM', check_permission: false }
+            meta: { title: '人民币总量', icon: 'el-icon-date', menus: 'menu_quantization_basedata_cn_m_list', check_permission: false }
           },
           {
             path: 'stockbasic',
@@ -62,10 +62,10 @@ const constantRoutes = [
             meta: { title: '股票列表', icon: 'table', menus: 'menu_QuantizationBaseDataStockBasic', check_permission: false }
           },
           {
-            path: 'daily',
-            name: 'QuantizationBaseDataDaily',
+            path: 'daily_list',
+            name: 'quantization_basedata_daily_list',
             component: () => import('@/views/quantization/basedata/daily_list'),
-            meta: { title: '个股日线行情', icon: 'el-icon-data-line', menus: 'menu_QuantizationBaseDataDaily', check_permission: false }
+            meta: { title: '个股日线行情', icon: 'el-icon-data-line', menus: 'menu_quantization_basedata_daily_list', check_permission: false }
           },
           {
             path: 'concept',
