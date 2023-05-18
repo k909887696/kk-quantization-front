@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { get_cn_m_page_result } from '@/api/quantization/cn_m'
+import { get_cn_m_page_list } from '@/api/quantization/cn_m'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { parseTime, renderHeaderTip, addTime } from '@/utils/index.js'
 import waves from '@/directive/waves' // waves directive
@@ -184,7 +184,7 @@ export default {
   },
   methods: {
     getList() {
-      get_cn_m_page_result(this.listQuery).then(response => {
+      get_cn_m_page_list(this.listQuery).then(response => {
         var xAxisData = []
         var yAxisM0 = []
         var yAxisM1 = []
