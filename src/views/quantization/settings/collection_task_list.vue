@@ -17,12 +17,14 @@
               reserve-keyword
               placeholder="请输入关键词"
               :remote-method="get_collection_policy_page_result_4_select"
-              :loading="collectionPolicyListLoading">
+              :loading="collectionPolicyListLoading"
+>
               <el-option
                 v-for="item in collectionPolicyList"
                 :key="item.policyId"
                 :label="item.name"
-                :value="item.policyId" />
+                :value="item.policyId"
+/>
             </el-select>
           </el-form-item>
           <el-form-item label="调度类型:">
@@ -87,7 +89,8 @@
             title="参数"
             width="300"
             trigger="click"
-            :content="scope.row.invokeParams">
+            :content="scope.row.invokeParams"
+>
             <el-button slot="reference">查看</el-button>
           </el-popover>
 
@@ -105,7 +108,8 @@
             title="异常信息"
             width="300"
             trigger="click"
-            :content="scope.row.exMsg">
+            :content="scope.row.exMsg"
+>
             <el-button slot="reference">查看</el-button>
           </el-popover>
         </template>
@@ -119,7 +123,7 @@
       <el-table-column align="center" label="完成时间" width="110">
         <template slot-scope="scope">
           <i class="el-icon-time" />
-          <span>{{ scope.row.finishTime ===null ? '' : parseTime(new Date(scope.row.finishTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+          <span>{{ parseTime(new Date(scope.row.finishTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="预定执行时间" width="110">

@@ -3,7 +3,7 @@ import config from '@/config'
 
 export function get_invoke_type_page_result(params, isLoading) {
   return request({
-    url: config.quantization_api_url + '/quantization/api/v1/invoke_type/get_invoke_type_page_result',
+    url: config.quantization_api_url + '/quantization/api/v1/invoke_type/get_invoke_type_page_list',
     method: 'post',
     data: params,
     isLoading
