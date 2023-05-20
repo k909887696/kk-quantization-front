@@ -68,6 +68,12 @@ const constantRoutes = [
             meta: { title: '个股日线行情', icon: 'el-icon-data-line', menus: 'menu_quantization_basedata_daily_list', check_permission: false }
           },
           {
+            path: 'money_flow_list',
+            name: 'quantization_money_flow_list',
+            component: () => import('@/views/quantization/basedata/money_flow_list'),
+            meta: { title: '个股资金流向	', icon: 'el-icon-date', menus: 'menu_quantization_money_flow_list', check_permission: false }
+          },
+          {
             path: 'concept_list',
             name: 'quantization_concept_list',
             component: () => import('@/views/quantization/basedata/concept_list'),

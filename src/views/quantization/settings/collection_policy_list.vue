@@ -116,11 +116,12 @@
       </el-table-column>
       <el-table-column label="" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
+          
           <el-button type="primary" icon="el-icon-edit" size="mini" @click="editDataDialog(row)">
             编辑
           </el-button>
-          <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteData(row)">
-            删除
+          <el-button type="primary" icon="el-icon-news" size="mini" @click="copyData(row)">
+            复制
           </el-button>
         </template>
       </el-table-column>
@@ -177,7 +178,7 @@
         <el-button @click="dialogFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='add'?addData():updateData()">
+        <el-button type="primary" @click="dialogStatus==='insert'?addData():updateData()">
           确定
         </el-button>
       </div>
@@ -241,7 +242,7 @@ export default {
         exMsg: undefined,
         invokeMethod: undefined
       },
-      dialogStatus: 'add'
+      dialogStatus: 'insert'
     }
   },
   created() {
@@ -274,18 +275,13 @@ export default {
         this.getList()
       })
     },
-    deleteData() {
-      this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.getList()
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除!'
-        })
+    copyData(row) {
+      this.dialogStatus = 'insert'
+      get_policy({ policyId: row.policyId }).then(response => {
+        this.temp = Object.assign({}, response.data === null ? row : response.data) // copy obj
+        this.temp.preRunTime = parseTime(new Date(row.preRunTime), '{y}-{m}-{d} {h}:{i}:{s}')
+        this.temp.policyId = ''
+        this.dialogFormVisible = true
       })
     },
     editDataDialog(row) {
