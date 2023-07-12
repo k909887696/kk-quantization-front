@@ -12,6 +12,7 @@
     "prod": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve --mode prod",
     "build:prod": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build",
     "build:test": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build --mode test",
+    "build:testmeiya": "vue-cli-service build --mode testmeiya",
     "build:hg": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build --mode hg",
     "build:stage": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build --mode staging",
     "preview": "node build/index.js --preview",
