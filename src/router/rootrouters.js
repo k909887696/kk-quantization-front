@@ -35,7 +35,7 @@ const constantRoutes = [
     path: '/quantization',
     component: Layout,
     name: 'quantization',
-    meta: { title: 'quantization', icon: 'el-icon-data-analysis', menus: 'menu_quantization', check_permission: false },
+    meta: { title: '量化分析系统', icon: 'el-icon-data-analysis', menus: 'menu_quantization', check_permission: false },
     children: [
       {
         path: 'basedata',
