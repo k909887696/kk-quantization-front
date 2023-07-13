@@ -293,7 +293,7 @@ export default {
       })
     },
     addDataDialog(row) {
-      this.dialogStatus = 'add'
+      this.dialogStatus = 'insert'
       this.temp = Object.assign({}, row) // copy obj
       this.temp.runCount = 0
       this.dialogFormVisible = true
