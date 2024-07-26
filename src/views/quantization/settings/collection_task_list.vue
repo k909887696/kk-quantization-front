@@ -82,6 +82,11 @@
           <span>{{ scope.row.invokeCode }}</span>
         </template>
       </el-table-column>
+           <el-table-column label="执行渠道" width="50" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.channel }}
+        </template>
+      </el-table-column>
       <el-table-column class-name="status-col" width="150" label="执行参数" align="center">
         <template slot-scope="scope">
           <el-popover
@@ -101,20 +106,13 @@
           {{ scope.row.runCount }}
         </template>
       </el-table-column>
-      <el-table-column label="异常信息" align="center" width="150">
-        <template slot-scope="scope">
-          <el-popover
-            placement="right"
-            title="异常信息"
-            width="300"
-            trigger="click"
-            :content="scope.row.exMsg"
->
-            <el-button slot="reference">查看</el-button>
-          </el-popover>
+      <el-table-column label="异常信息" align="center" width="200">
+        <template slot-scope="{row}">
+          <el-button slot="reference" @click="showMsgDig(row)">查看</el-button>
+          <el-button type="primary" icon="el-icon-video-play" size="mini" @click="retry_execute_task(row)">执行</el-button>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="执行时间" width="110">
+      <el-table-column align="center" label="执行时间" width="110" >
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ parseTime(new Date(scope.row.runTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
@@ -140,61 +138,10 @@
       </el-table-column>
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.pageIndex" :limit.sync="listQuery.pageSize" @pagination="getList" />
-    <el-dialog title="调度策略编辑" :visible.sync="dialogFormVisible" :close-on-click-modal="false" top="50px">
-      <el-form ref="dataForm" :model="temp" label-position="right" label-width="110px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="策略编号" prop="type">
-          <el-input v-model="temp.policyId" readonly disabled />
-        </el-form-item>
-        <el-form-item label="策略名称" prop="type">
-          <el-input v-model="temp.name" />
-        </el-form-item>
-        <el-form-item label="调度类型编号" prop="type">
-          <el-select v-model="temp.invokeCode" placeholder="请选择">
-            <el-option
-              v-for="item in invokeTypeList"
-              :key="item.invokeCode"
-              :label="item.name"
-              :value="item.invokeCode"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="调度周期" prop="type">
-          <el-select v-model="temp.invokeCycle" placeholder="请选择">
-            <el-option
-              v-for="item in Object.keys(invokeCycleTypeList)"
-              :key="item"
-              :label="invokeCycleTypeList[item]"
-              :value="item"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="调度周期次数" prop="type">
-          <el-input v-model="temp.invokeCycleTime" />
-        </el-form-item>
-        <el-form-item label="预定执行时间" prop="type">
-          <el-date-picker v-model="temp.preRunTime" type="datetime" format="yyyy-MM-dd HH:mm:ss" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择时间" />
-        </el-form-item>
-        <el-form-item label="调度类型参数" prop="type">
-          <el-input v-model="temp.invokeParams" />
-        </el-form-item>
-        <el-form-item label="调度类型方法" prop="type">
-          <el-input v-model="temp.invokeMethod" />
-        </el-form-item>
-        <el-form-item label="执行次数" prop="type">
-          <el-input v-model="temp.runCount" oninput="value=value.replace(/[^0-9]/g,'')" />
-        </el-form-item>
-        <el-form-item label="异常信息" prop="type">
-          <el-input v-model="temp.exMsg" />
-        </el-form-item>
+    <el-dialog title="异常信息" :visible.sync="dialogFormVisible" width="80%" :close-on-click-modal="false" top="50px">
+      <el-form ref="dataForm" :model="temp" label-position="right" label-width="110px" style="width: 95%; margin-left:30px;    font-size: 15px;font-weight: 700;">
+        <span>{{ temp.exMsg }}</span>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
-          取消
-        </el-button>
-        <el-button type="primary" @click="dialogStatus==='add'?addData():updateData()">
-          确定
-        </el-button>
-      </div>
     </el-dialog>
   </div>
 </template>
@@ -202,7 +149,7 @@
 <script>
 import { get_invoke_type_page_result, get_base_data_item_map } from '@/api/quantization/settings'
 import { get_collection_policy_page_result } from '@/api/quantization/collection_policy'
-import { get_collection_task_page_result, update_policy, insert_policy, get_policy } from '@/api/quantization/collection_task'
+import { get_collection_task_page_result, update_policy, insert_policy, retry_execute_task } from '@/api/quantization/collection_task'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { parseTime, renderHeaderTip } from '@/utils/index.js'
 import waves from '@/directive/waves' // waves directive
@@ -298,13 +245,13 @@ export default {
         this.getList()
       })
     },
-    editDataDialog(row) {
+    retry_execute_task(row) {
+      retry_execute_task({ taskId: row.taskId })
+    },
+    showMsgDig(row) {
       this.dialogStatus = 'update'
-      get_policy({ policyId: row.policyId }).then(response => {
-        this.temp = Object.assign({}, response.data === null ? row : response.data) // copy obj
-        this.temp.preRunTime = parseTime(new Date(row.preRunTime), '{y}-{m}-{d} {h}:{i}:{s}')
-        this.dialogFormVisible = true
-      })
+      this.temp = Object.assign({}, row === null ? row : row) // copy obj
+      this.dialogFormVisible = true
     },
     addDataDialog(row) {
       this.dialogStatus = 'add'

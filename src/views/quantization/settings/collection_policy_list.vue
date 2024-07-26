@@ -85,6 +85,11 @@
           {{ scope.row.invokeMethod }}
         </template>
       </el-table-column>
+      <el-table-column label="执行渠道" width="50" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.channel }}
+        </template>
+      </el-table-column>
       <el-table-column label="异常次数" width="50" align="center" :render-header="(h, obj) => renderHeaderTip(h, obj, '超过10次自动挂起')">
         <template slot-scope="scope">
           {{ scope.row.runCount }}
@@ -114,14 +119,16 @@
           <span>{{ parseTime(new Date(scope.row.createTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="" align="center" width="200" class-name="small-padding fixed-width">
+      <el-table-column label="" align="center" width="300" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          
           <el-button type="primary" icon="el-icon-edit" size="mini" @click="editDataDialog(row)">
             编辑
           </el-button>
           <el-button type="primary" icon="el-icon-news" size="mini" @click="copyData(row)">
             复制
+          </el-button>
+          <el-button type="primary" icon="el-icon-video-play" size="mini" @click="execute_policy_by_hand(row)">
+            执行
           </el-button>
         </template>
       </el-table-column>
@@ -173,6 +180,9 @@
         <el-form-item label="异常信息" prop="type">
           <el-input v-model="temp.exMsg" />
         </el-form-item>
+        <el-form-item label="执行渠道" prop="type">
+          <el-input v-model="temp.channel" />
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -188,7 +198,7 @@
 
 <script>
 import { get_invoke_type_page_result, get_base_data_item_map } from '@/api/quantization/settings'
-import { get_collection_policy_page_result, update_policy, insert_policy, get_policy } from '@/api/quantization/collection_policy'
+import { get_collection_policy_page_result, update_policy, insert_policy, get_policy, execute_policy_by_hand } from '@/api/quantization/collection_policy'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { parseTime, renderHeaderTip } from '@/utils/index.js'
 import waves from '@/directive/waves' // waves directive
@@ -240,6 +250,7 @@ export default {
         runCount: 0,
         invokeCycleTime: undefined,
         exMsg: undefined,
+        channel: undefined,
         invokeMethod: undefined
       },
       dialogStatus: 'insert'
@@ -283,6 +294,9 @@ export default {
         this.temp.policyId = ''
         this.dialogFormVisible = true
       })
+    },
+    execute_policy_by_hand(row) { // 手动执行一次策略
+      execute_policy_by_hand({ policyId: row.policyId })
     },
     editDataDialog(row) {
       this.dialogStatus = 'update'

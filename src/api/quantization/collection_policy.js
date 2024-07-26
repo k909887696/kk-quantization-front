@@ -37,3 +37,12 @@ export function get_policy(params, isLoading) {
     isLoading
   })
 }
+
+export function execute_policy_by_hand(params, isLoading) {
+  return request({
+    url: config.quantization_api_url + '/quantization/api/v1/collection_policy/execute_policy_by_hand',
+    method: 'post',
+    data: params,
+    isLoading
+  })
+}

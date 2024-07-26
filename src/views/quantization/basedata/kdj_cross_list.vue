@@ -102,96 +102,96 @@
 </template>
 
 <script>
-    // import { get_base_data_item_map } from '@/api/quantization/settings'
-    import { get_kdj_cross_page_list, deleteById, insert, update, get_details } from '@/api/quantization/kdj_cross_api'
-    import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-    import { parseTime, renderHeaderTip } from '@/utils/index.js'
-    import waves from '@/directive/waves' // waves directive
-    import config from '@/config'
-    export default {
-        components: { Pagination },
-        directives: { waves },
-        filters: {
+// import { get_base_data_item_map } from '@/api/quantization/settings'
+import { get_kdj_cross_page_list, deleteById, insert, update, get_details } from '@/api/quantization/kdj_cross_api'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { parseTime, renderHeaderTip } from '@/utils/index.js'
+import waves from '@/directive/waves' // waves directive
+import config from '@/config'
+export default {
+  components: { Pagination },
+  directives: { waves },
+  filters: {
 
-        },
-        data() {
-            return {
-                empty_tip: config.table_list_empty_tip,
-                list: null,
-                total: 0,
-                listQuery: {
-                    tsCode: undefined,
-                    tradeDateStart: undefined,
-                    tradeDateEnd: undefined,
-                    crossType: undefined,
-                    analysisType: undefined,
-                    pageIndex: 1,
-                    pageSize: 10
-                },
-                dialogFormVisible: false,
-                temp: {
-                    tsCode: undefined,
-                    tradeDate: undefined,
-                    crossType: undefined,
-                    analysisType: undefined
-                },
-                dialogStatus: 'insert'
-            }
-        },
-        created() { // 初始化界面
-            this.getPageList()
-        },
-        methods: {
-            getPageList() { // 查询列表分页
-                get_kdj_cross_page_list(this.listQuery).then(response => {
-                    this.list = response.data === null ? [] : response.data.result
-                    this.total = response.data === null ? 0 : response.data.totalCount
-                })
-            },
-            deleteData(row) {
-                this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    deleteById(row).then(response => {
-                        this.dialogFormVisible = false
-                        this.getPageList()
-                    })
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除!'
-                    })
-                })
-            },
-            updateData() {
-                update(this.temp).then(response => {
-                    this.dialogFormVisible = false
-                    this.getPageList()
-                })
-            },
-            addData() {
-                insert(this.temp).then(response => {
-                    this.dialogFormVisible = false
-                    this.getPageList()
-                })
-            },
-            editDataDialog(row) {
-                this.dialogStatus = 'update'
-                get_details(row).then(response => {
-                    this.temp = Object.assign({}, response.data === null ? row : response.data) // copy obj
-
-                    this.dialogFormVisible = true
-                })
-            },
-            addDataDialog(row) {
-                this.dialogStatus = 'insert'
-                this.temp = Object.assign({}, row) // copy obj
-                this.dialogFormVisible = true
-            },
-            parseTime: parseTime,
-            renderHeaderTip: renderHeaderTip
-        }
+  },
+  data() {
+    return {
+      empty_tip: config.table_list_empty_tip,
+      list: null,
+      total: 0,
+      listQuery: {
+        tsCode: undefined,
+        tradeDateStart: undefined,
+        tradeDateEnd: undefined,
+        crossType: undefined,
+        analysisType: undefined,
+        pageIndex: 1,
+        pageSize: 10
+      },
+      dialogFormVisible: false,
+      temp: {
+        tsCode: undefined,
+        tradeDate: undefined,
+        crossType: undefined,
+        analysisType: undefined
+      },
+      dialogStatus: 'insert'
     }
+  },
+  created() { // 初始化界面
+    this.getPageList()
+  },
+  methods: {
+    getPageList() { // 查询列表分页
+      get_kdj_cross_page_list(this.listQuery).then(response => {
+        this.list = response.data === null ? [] : response.data.result
+        this.total = response.data === null ? 0 : response.data.totalCount
+      })
+    },
+    deleteData(row) {
+      this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteById(row).then(response => {
+          this.dialogFormVisible = false
+          this.getPageList()
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除!'
+        })
+      })
+    },
+    updateData() {
+      update(this.temp).then(response => {
+        this.dialogFormVisible = false
+        this.getPageList()
+      })
+    },
+    addData() {
+      insert(this.temp).then(response => {
+        this.dialogFormVisible = false
+        this.getPageList()
+      })
+    },
+    editDataDialog(row) {
+      this.dialogStatus = 'update'
+      get_details(row).then(response => {
+        this.temp = Object.assign({}, response.data === null ? row : response.data) // copy obj
+
+        this.dialogFormVisible = true
+      })
+    },
+    addDataDialog(row) {
+      this.dialogStatus = 'insert'
+      this.temp = Object.assign({}, row) // copy obj
+      this.dialogFormVisible = true
+    },
+    parseTime: parseTime,
+    renderHeaderTip: renderHeaderTip
+  }
+}
 </script>

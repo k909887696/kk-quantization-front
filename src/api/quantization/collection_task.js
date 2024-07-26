@@ -45,3 +45,12 @@ export function get_policy(params, isLoading) {
     isLoading
   })
 }
+
+export function retry_execute_task(params, isLoading) {
+  return request({
+    url: config.quantization_api_url + '/quantization/api/v1/collection_task/retry_execute_task',
+    method: 'post',
+    data: params,
+    isLoading
+  })
+}
