@@ -38,6 +38,12 @@ const constantRoutes = [
     meta: { title: '量化分析系统', icon: 'el-icon-data-analysis', menus: 'menu_quantization', check_permission: false },
     children: [
       {
+        path: 'CnMList',
+        name: 'quantization_CnMList',
+        component: () => import('@/views/quantization/CnMList'),
+        meta: { title: '人民币货币总量对象', icon: 'table', menus: 'v_menu_select_CnM', check_permission: false }
+      },
+      {
         path: 'basedata',
         name: 'quantization_basedata',
         component: () => import('@/layout/components/MultiLevelMenu'),
