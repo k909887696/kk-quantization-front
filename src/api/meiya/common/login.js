@@ -1,9 +1,9 @@
-import request from '@/utils/request4Meiya'
+import request from '@/utils/request4View'
 import config from '@/config'
 
 export function platlogin(params, isLoading) {
   return request({
-    url: config.meiya_tmcjurisdiction_api_url + '/apixs/v1/apixs/platlogin',
+    url: config.quantization_api_url + '/quantization/nl/nlapi/v1/login/login',
     method: 'post',
     data: params,
     headers: { 'source': config.meiya_platform_api_source, 'version': '1', 'Accept': '*/*' },
@@ -13,7 +13,7 @@ export function platlogin(params, isLoading) {
 
 export function get_platform_login(params, isLoading) {
   return request({
-    url: config.meiya_tmcjurisdiction_api_url + '/apis/v1/logininfo/get_platform_login',
+    url: config.quantization_api_url + '/quantization/nl/nlapi/v1/login/getLoginInfo',
     method: 'post',
     data: params,
     headers: { 'source': config.meiya_platform_api_source, 'version': '1' },
@@ -24,7 +24,7 @@ export function get_platform_login(params, isLoading) {
 
 export function platform_logout(params, isLoading) {
   return request({
-    url: config.meiya_tmcjurisdiction_api_url + '/apis/v1/logininfo/platform_logout',
+    url: config.quantization_api_url + '/quantization/nl/nlapi/v1/login/logOut',
     method: 'post',
     data: params,
     headers: { 'source': config.meiya_platform_api_source, 'version': '1' },
@@ -34,7 +34,7 @@ export function platform_logout(params, isLoading) {
 
 export function valid_platform_jurisdiction(params, isLoading) {
   return request({
-    url: config.meiya_tmcjurisdiction_api_url + '/apis/v1/logininfo/valid_platform_jurisdiction',
+    url: config.quantization_api_url + '/quantization/nl/nlapi/v1/login/getPermissionList',
     method: 'post',
     data: params,
     headers: { 'source': config.meiya_platform_api_source, 'version': '1' },

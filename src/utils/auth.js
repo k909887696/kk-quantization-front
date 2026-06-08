@@ -16,17 +16,17 @@ export function removeToken() {
 }
 
 export function validPlatformJurisdiction(permission) {
-  valid_platform_jurisdiction({ jurisdictionIds: [permission] }).then(response => {
-    return response.data.jurisdictions[permission] && response.data.jurisdictions[permission] === '1'
+  valid_platform_jurisdiction({ permissionList: [permission] }).then(response => {
+    return response.data.permissionList[permission] 
   })
 }
 
 export function getPermissionPlatformJurisdiction(allPermissions) {
-  const validRequest = { jurisdictionIds: allPermissions || [] }
+  const validRequest = { permissionList: allPermissions || [] }
   const permissions = []
   valid_platform_jurisdiction(validRequest).then(response => {
     allPermissions.forEach(p => {
-      if (response.data.jurisdictions[p] && response.data.jurisdictions[p] === '1') {
+      if (response.data.permissionList[p] ) {
         permissions.push(p)
       }
     })

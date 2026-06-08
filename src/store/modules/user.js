@@ -33,10 +33,10 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      platlogin({ userName: username.trim(), passWord: password, verifyCode: config.meiya_platform_login_key }).then(response => {
+      platlogin({ userId: username.trim(), password: password, code: config.meiya_platform_login_key }).then(response => {
         const { data } = response
-        commit('SET_TOKEN', data.sessionId)
-        setToken(data.sessionId)
+        commit('SET_TOKEN', data.token)
+        setToken( data.token)
         resolve()
       }).catch(error => {
         reject(error)

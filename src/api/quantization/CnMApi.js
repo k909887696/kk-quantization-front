@@ -10,7 +10,7 @@ import config from '@/config'
 // 查询人民币货币总量对象列表分页
 export function getCnMPageList(params, isLoading) {
   return request({
-    url: config.quantization_api_url + '/quantization/v/vapi/VCnM/getCnMPageList',
+    url: config.quantization_api_url + '/quantization/v/vapi/v1/VCnM/getCnMPageList',
     method: 'post',
     data: params,
     isLoading
@@ -19,7 +19,7 @@ export function getCnMPageList(params, isLoading) {
 // 删除人民币货币总量对象
 export function deleteCnMById(params, isLoading) {
   return request({
-      url: config.quantization_api_url + '/quantization/v/vapi/VCnM/deleteCnMById',
+      url: config.quantization_api_url + '/quantization/v/vapi/v1/VCnM/deleteCnMById',
     method: 'post',
     data: params,
     isLoading
@@ -28,7 +28,7 @@ export function deleteCnMById(params, isLoading) {
 // 插入人民币货币总量对象
 export function insertCnM(params, isLoading) {
   return request({
-    url: config.quantization_api_url + '/quantization/v/vapi/VCnM/insertCnM',
+    url: config.quantization_api_url + '/quantization/v/vapi/v1/VCnM/insertCnM',
     method: 'post',
     data: params,
     isLoading
@@ -37,7 +37,7 @@ export function insertCnM(params, isLoading) {
 // 更新人民币货币总量对象
 export function updateCnM(params, isLoading) {
   return request({
-    url: config.quantization_api_url + '/quantization/v/vapi/VCnM/updateCnM',
+    url: config.quantization_api_url + '/quantization/v/vapi/v1/VCnM/updateCnM',
     method: 'post',
     data: params,
     isLoading

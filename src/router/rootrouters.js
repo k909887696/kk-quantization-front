@@ -38,22 +38,16 @@ const constantRoutes = [
     meta: { title: '量化分析系统', icon: 'el-icon-data-analysis', menus: 'menu_quantization', check_permission: false },
     children: [
       {
-        path: 'CnMList',
-        name: 'quantization_CnMList',
-        component: () => import('@/views/quantization/CnMList'),
-        meta: { title: '人民币货币总量对象', icon: 'table', menus: 'v_menu_select_CnM', check_permission: false }
-      },
-      {
         path: 'basedata',
         name: 'quantization_basedata',
         component: () => import('@/layout/components/MultiLevelMenu'),
         meta: { title: '基础数据', icon: 'table', menus: 'menu_quantization_basedata', check_permission: false },
         children: [
           {
-            path: 'trade_cal_list',
-            name: 'quantization_trade_cal_list',
-            component: () => import('@/views/quantization/basedata/trade_cal_list'),
-            meta: { title: '交易日历', icon: 'el-icon-date', menus: 'menu_quantization_trade_cal_list', check_permission: false }
+            path: 'TradeCalList',
+            name: 'quantization_TradeCalList',
+            component: () => import('@/views/quantization/basedata/TradeCalList'),
+            meta: { title: '交易日历', icon: 'table', menus: 'v_menu_select_TradeCal', check_permission: false }
           },
           {
             path: 'cn_m_list',
@@ -62,16 +56,16 @@ const constantRoutes = [
             meta: { title: '人民币总量', icon: 'el-icon-date', menus: 'menu_quantization_basedata_cn_m_list', check_permission: false }
           },
           {
-            path: 'stock_basic_list',
-            name: 'quantization_stock_basic_list',
-            component: () => import('@/views/quantization/basedata/stock_basic_list'),
-            meta: { title: '个股基本信息	', icon: 'el-icon-date', menus: 'menu_quantization_stock_basic_list', check_permission: false }
+            path: 'StockBasicList',
+            name: 'quantization_StockBasicList',
+            component: () => import('@/views/quantization/basedata/StockBasicList'),
+            meta: { title: '个股基本信息', icon: 'table', menus: 'v_menu_select_StockBasic', check_permission: false }
           },
           {
-            path: 'daily_list',
-            name: 'quantization_basedata_daily_list',
-            component: () => import('@/views/quantization/basedata/daily_list'),
-            meta: { title: '个股日线行情', icon: 'el-icon-data-line', menus: 'menu_quantization_basedata_daily_list', check_permission: false }
+            path: 'DailyList',
+            name: 'quantization_DailyList',
+            component: () => import('@/views/quantization/basedata/DailyList'),
+            meta: { title: '个股日线行情', icon: 'table', menus: 'v_menu_select_Daily', check_permission: false }
           },
           {
             path: 'money_flow_list',
@@ -158,10 +152,10 @@ const constantRoutes = [
     meta: { title: '权限系统', icon: 'password' },
     children: [
       {
-        path: 'usermanage',
-        name: 'PermissionUserManage',
-        component: () => import('@/views/tree/index'),
-        meta: { title: '用户管理', icon: 'user', menus: 'menu_PermissionUserManage', check_permission: false }
+        path: 'SyUserList',
+        name: 'quantization_SyUserList',
+        component: () => import('@/views/permission/SyUserList'),
+        meta: { title: '用户信息', icon: 'table', menus: 'v_menu_select_SyUser', check_permission: false }
       },
       {
         path: 'authmanage',
