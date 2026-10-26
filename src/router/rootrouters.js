@@ -140,6 +140,41 @@ const constantRoutes = [
             name: 'QuantizationSystemSettingCollectionPolicyList',
             component: () => import('@/views/quantization/settings/collection_task_history_list'),
             meta: { title: '调度任务历史', icon: 'el-icon-cloudy', menus: 'menu_QuantizationSystemSettingCollectionTaskHistoryList', check_permission: false }
+          },
+          {
+            path: 'SyDagFlowList',
+            name: 'quantization_SyDagFlowList',
+            component: () => import('@/views/quantization/settings/SyDagFlowList'),
+            meta: { title: 'DAG流程', icon: 'table', menus: 'v_menu_select_SyDagFlow', check_permission: false }
+          },
+          {
+            path: 'SyDagMainList',
+            name: 'quantization_SyDagMainList',
+            component: () => import('@/views/quantization/settings/SyDagMainList'),
+            meta: { title: 'DAG主图', icon: 'table', menus: 'v_menu_select_SyDagMain', check_permission: false }
+          },
+          {
+            path: 'SyDagNodeList',
+            name: 'quantization_SyDagNodeList',
+            component: () => import('@/views/quantization/settings/SyDagNodeList'),
+            meta: { title: 'DAG节点', icon: 'table', menus: 'v_menu_select_SyDagNode', check_permission: false }
+          },
+          {
+            path: 'SyDagProcessMainList',
+            name: 'quantization_SyDagProcessMainList',
+            component: () => import('@/views/quantization/settings/SyDagProcessMainList'),
+            meta: { title: 'DAG实例', icon: 'table', menus: 'v_menu_select_SyDagProcessMain', check_permission: false }
+          }, {
+            path: 'SyDagProcessTaskList',
+            name: 'quantization_SyDagProcessTaskList',
+            component: () => import('@/views/quantization/settings/SyDagProcessTaskList'),
+            meta: { title: 'DAG任务', icon: 'table', menus: 'v_menu_select_SyDagProcessTask', check_permission: false }
+          },
+          {
+            path: 'SyDagProcessTaskHisList',
+            name: 'quantization_SyDagProcessTaskHisList',
+            component: () => import('@/views/quantization/settings/SyDagProcessTaskHisList'),
+            meta: { title: 'DAG历史任务', icon: 'table', menus: 'v_menu_select_SyDagProcessTaskHis', check_permission: false }
           }
         ]
       }
