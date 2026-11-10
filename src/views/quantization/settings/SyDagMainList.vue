@@ -27,7 +27,7 @@
             <el-date-picker v-model="listQuery.preRunTimeStart" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" /> -
             <el-date-picker v-model="listQuery.preRunTimeEnd" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" />
           </el-form-item>
-          
+
           <el-form-item label="创建时间:">
             <el-date-picker v-model="listQuery.createTimeStart" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" /> -
             <el-date-picker v-model="listQuery.createTimeEnd" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" />
@@ -79,7 +79,12 @@
       </el-table-column>
       <el-table-column align="center" label="执行节点默认参数" width="150">
         <template slot-scope="scope">
-          {{ scope.row.runParams }}
+          <el-tooltip v-if="scope.row.runParams" content="点击查看JSON" placement="top">
+            <el-button type="text" size="mini" @click="$refs.jsonViewer.show(scope.row.runParams, '执行节点默认参数')">
+              查看JSON
+            </el-button>
+          </el-tooltip>
+          <span v-else>-</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="执行cron表达式" width="220">
@@ -94,9 +99,11 @@
           <span>{{ parseTime(new Date(scope.row.preRunTime) ,'{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="状态（1：启用，0：禁用）" width="150">
+      <el-table-column align="center" label="状态" width="100">
         <template slot-scope="scope">
-          {{ scope.row.status }}
+          <el-tag :type="scope.row.status === 1 || scope.row.status === '1' ? 'success' : 'danger'">
+            {{ scope.row.status === 1 || scope.row.status === '1' ? '启用' : '禁用' }}
+          </el-tag>
         </template>
       </el-table-column>
       <el-table-column align="center" label="创建时间" width="110">
@@ -110,10 +117,18 @@
           {{ scope.row.exMessage }}
         </template>
       </el-table-column>
-      <el-table-column label="" align="center" width="200" class-name="small-padding fixed-width" fixed="right">
+      <el-table-column label="" align="center" width="300" class-name="small-padding fixed-width" fixed="right">
         <template slot-scope="{row}">
           <el-button type="primary" icon="el-icon-edit" size="mini" @click="editDataDialog(row)">
             编辑
+          </el-button>
+          <el-button
+            :type="row.status === 1 || row.status === '1' ? 'warning' : 'success'"
+            :icon="row.status === 1 || row.status === '1' ? 'el-icon-close' : 'el-icon-check'"
+            size="mini"
+            @click="toggleStatus(row)"
+          >
+            {{ row.status === 1 || row.status === '1' ? '禁用' : '启用' }}
           </el-button>
           <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteData(row)">
             删除
@@ -128,7 +143,7 @@
       :title="dialogStatus === 'insert' ? '添加DAG' : '编辑DAG'"
       :visible.sync="dialogFormVisible"
       :close-on-click-modal="false"
-      top="3vh"
+      top="10px"
       width="90%"
       custom-class="dag-dialog"
     >
@@ -142,12 +157,15 @@
               <el-input v-model="temp.dagName" placeholder="DAG名称" />
             </el-form-item>
             <el-form-item label="关联开始DAG节点编号" prop="nodeCode">
-              <el-select v-model="temp.nodeCode" placeholder="请选择开始节点" style="width: 100%;" filterable>
+              <el-select v-model="temp.nodeCode" placeholder="请选择开始节点" style="width: 100%;" filterable @change="onNodeCodeChange">
                 <el-option v-for="node in availableNodes" :key="node.nodeCode" :label="node.nodeName + ' (' + node.nodeCode + ')'" :value="node.nodeCode" />
               </el-select>
             </el-form-item>
             <el-form-item label="执行节点默认参数" prop="runParams">
-              <el-input v-model="temp.runParams" placeholder="执行节点默认参数" />
+              <el-input v-model="temp.runParams" type="textarea" :rows="3" placeholder="执行节点默认参数" style="width: calc(100% - 110px);" />
+              <el-button type="text" size="mini" icon="el-icon-view" style="margin-left: 10px; color: #409eff;" @click="$refs.jsonViewer.show(temp.runParams, '执行节点默认参数')">
+                查看JSON
+              </el-button>
             </el-form-item>
             <el-form-item label="执行cron表达式" prop="runCron">
               <el-input v-model="temp.runCron" placeholder="执行cron表达式" style="width: calc(100% - 110px);" @change="onCronInput" />
@@ -169,7 +187,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="异常信息" prop="exMessage">
-              <el-input v-model="temp.exMessage" placeholder="异常信息" />
+              <el-input v-model="temp.exMessage" type="textarea" :rows="3" placeholder="异常信息" />
             </el-form-item>
           </el-form>
         </el-tab-pane>
@@ -212,15 +230,18 @@
         </el-table-column>
       </el-table>
     </el-dialog>
+    <!-- JSON查看器 -->
+    <json-viewer ref="jsonViewer" @save="onJsonSave" />
   </div>
 </template>
 
 <script>
-import { getSyDagMainPageList, deleteSyDagMainById, insertSyDagMain, updateSyDagMain, getSyDagMainDetails } from '@/api/quantization/SyDagMainApi'
+import { getSyDagMainPageList, deleteSyDagMainById, insertSyDagMain, updateSyDagMain, getSyDagMainDetails, updateSyDagMainStatus } from '@/api/quantization/SyDagMainApi'
 import { getSyDagNodePageList, insertSyDagNode } from '@/api/quantization/SyDagNodeApi'
 import { getSyDagFlowPageList } from '@/api/quantization/SyDagFlowApi'
 import Pagination from '@/components/Pagination'
 import DagDesigner from '@/components/DagDesigner'
+import JsonViewer from '@/components/JsonViewer'
 import vcrontab from 'vcrontab'
 import { parseTime } from '@/utils/index.js'
 import { validateCron, getNextCronDate, getNextCronDates } from '@/utils/cron'
@@ -228,7 +249,7 @@ import waves from '@/directive/waves'
 import config from '@/config'
 
 export default {
-  components: { Pagination, DagDesigner, vcrontab },
+  components: { Pagination, DagDesigner, JsonViewer, vcrontab },
   directives: { waves },
   filters: {},
   data() {
@@ -318,7 +339,8 @@ export default {
     },
     updateData() {
       this.temp.preRunTime = this.temp.preRunTime ? new Date(this.temp.preRunTime) : undefined
-      this.temp.createTime = this.temp.createTime ? new Date(this.temp.createTime) : undefined
+      // 更新时不传 createTime，使用后端保存的数据
+      delete this.temp.createTime
       this.fillDagFlowInfo()
       this.buildDagFlowList().then(() => {
         updateSyDagMain(this.temp).then(response => {
@@ -329,7 +351,6 @@ export default {
     },
     addData() {
       this.temp.preRunTime = this.temp.preRunTime ? new Date(this.temp.preRunTime) : undefined
-      this.temp.createTime = this.temp.createTime ? new Date(this.temp.createTime) : undefined
       this.fillDagFlowInfo()
       this.buildDagFlowList().then(() => {
         insertSyDagMain(this.temp).then(response => {
@@ -340,7 +361,7 @@ export default {
     },
     // 填充dagFlowInfo到temp
     fillDagFlowInfo() {
-      if (this.$refs.dagDesigner) {
+      if (this.$refs.dagDesigner && this.$refs.dagDesigner.graph) {
         const graphData = this.$refs.dagDesigner.getGraphData()
         const { nodes, canvasSize } = graphData
         this.temp.dagFlowInfo = JSON.stringify({
@@ -351,7 +372,7 @@ export default {
     },
     // 组装DAG流程数据到temp
     async buildDagFlowList() {
-      if (!this.$refs.dagDesigner) return
+      if (!this.$refs.dagDesigner || !this.$refs.dagDesigner.graph) return
       const graphData = this.$refs.dagDesigner.getGraphData()
       const { nodes, edges } = graphData
 
@@ -382,11 +403,16 @@ export default {
       })
 
       // 为所有节点生成记录（包括没有出边的节点）
-      const dagFlowList = Array.from(allNodeCodes).map(nodeCode => ({
-        nodeCode: nodeCode,
-        nextNodeCode: nextMap[nodeCode] || '',
-        preNodeCode: preMap[nodeCode] || ''
-      }))
+      const dagFlowList = Array.from(allNodeCodes).map(nodeCode => {
+        const node = nodes.find(n => n.nodeCode === nodeCode)
+        return {
+          dagFlowId: node && node.dagFlowId ? node.dagFlowId : '',
+          nodeCode: nodeCode,
+          nextNodeCode: nextMap[nodeCode] || '',
+          preNodeCode: preMap[nodeCode] || '',
+          runParams: node && (node.runParam || node.runParams) ? (node.runParam || node.runParams) : ''
+        }
+      })
 
       // 按照 DAG 执行顺序排序（从根节点开始，沿着下级依次向下）
       const sortedList = []
@@ -437,12 +463,22 @@ export default {
     addDataDialog(row) {
       this.dialogStatus = 'insert'
       this.activeTab = 'basic'
-      this.temp = Object.assign({}, row)
+      this.temp = Object.assign({
+        status: 1
+      }, row)
       this.initialNodes = []
       this.initialEdges = []
       this.dialogFormVisible = true
       // 加载可用节点列表
       this.loadAvailableNodes()
+    },
+    // 选择开始节点时自动加载节点默认参数
+    onNodeCodeChange(nodeCode) {
+      if (!nodeCode) return
+      const node = this.availableNodes.find(n => n.nodeCode === nodeCode)
+      if (node && node.runParam) {
+        this.temp.runParams = node.runParam
+      }
     },
     // 加载可用节点列表
     loadAvailableNodes() {
@@ -468,8 +504,16 @@ export default {
             if (flow.nextNodeCode) nodeCodes.add(flow.nextNodeCode)
           })
 
-          // 从可用节点中匹配
-          const nodes = this.availableNodes.filter(n => nodeCodes.has(n.nodeCode))
+          // 从可用节点中匹配，并合并dagflow数据
+          const nodes = this.availableNodes.filter(n => nodeCodes.has(n.nodeCode)).map(n => {
+            // 查找该节点在当前DAG流程中的数据
+            const flow = flows.find(f => f.nodeCode === n.nodeCode)
+            return {
+              ...n,
+              dagFlowId: flow && flow.dagFlowId ? flow.dagFlowId : '',
+              runParams: flow && flow.runParams ? flow.runParams : n.runParams || ''
+            }
+          })
 
           // 解析 dagFlowInfo，获取节点位置信息
           const nodePositions = {}
@@ -559,14 +603,41 @@ export default {
         this.cronError = '无法计算出下次执行时间'
       }
     },
-    parseTime: parseTime
+    parseTime: parseTime,
+    // 启用/禁用切换
+    toggleStatus(row) {
+      const newStatus = (row.status === 1 || row.status === '1') ? '0' : '1'
+      const actionText = newStatus === '1' ? '启用' : '禁用'
+      this.$confirm(`确认${actionText}该DAG?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        updateSyDagMainStatus({ dagId: row.dagId, status: newStatus }).then(() => {
+          this.$message.success(`${actionText}成功`)
+          this.getPageList()
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: `已取消${actionText}`
+        })
+      })
+    },
+    // JSON查看器保存回调
+    onJsonSave(jsonString) {
+      this.temp.runParams = jsonString
+      this.$message.success('执行参数已更新')
+    }
   }
 }
 </script>
 
 <style scoped>
 .dag-dialog {
-  height: 90vh;
+  max-height: calc(100vh - 20px);
+  display: flex;
+  flex-direction: column;
 }
 .dag-dialog >>> .el-tabs__content {
   padding: 0;
@@ -586,7 +657,9 @@ export default {
 }
 .dag-dialog >>> .el-dialog__body {
   padding: 0;
-  height: calc(90vh - 60px);
+  flex: 1;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 </style>

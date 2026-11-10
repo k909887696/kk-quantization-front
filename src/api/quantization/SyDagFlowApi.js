@@ -1,13 +1,13 @@
 /**
-*  api接口
+* DAG执行流 api接口
 *
 * @author kk
-* @since 2026-10-22
+* @since 2026-10-28
 */
 import request from '@/utils/request4View'
 import config from '@/config'
 
-// 查询列表分页
+// 查询DAG执行流列表分页
 export function getSyDagFlowPageList(params, isLoading) {
   return request({
     url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagFlow/getSyDagFlowPageList',
@@ -16,7 +16,7 @@ export function getSyDagFlowPageList(params, isLoading) {
     isLoading
   })
 }
-// 删除
+// 删除DAG执行流
 export function deleteSyDagFlowById(params, isLoading) {
   return request({
       url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagFlow/deleteSyDagFlowById',
@@ -25,7 +25,7 @@ export function deleteSyDagFlowById(params, isLoading) {
     isLoading
   })
 }
-// 插入
+// 插入DAG执行流
 export function insertSyDagFlow(params, isLoading) {
   return request({
     url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagFlow/insertSyDagFlow',
@@ -34,7 +34,7 @@ export function insertSyDagFlow(params, isLoading) {
     isLoading
   })
 }
-// 更新
+// 更新DAG执行流
 export function updateSyDagFlow(params, isLoading) {
   return request({
     url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagFlow/updateSyDagFlow',
@@ -43,7 +43,7 @@ export function updateSyDagFlow(params, isLoading) {
     isLoading
   })
 }
-// 获取详情
+// 获取DAG执行流详情
 export function getSyDagFlowDetails(params, isLoading) {
   return request({
     url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagFlow/getSyDagFlowDetails',

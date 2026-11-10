@@ -18,9 +18,12 @@
           <span>节点列表</span>
           <el-button size="mini" type="primary" plain @click="showAddNodeDialog">+ 新建节点</el-button>
         </div>
+        <div class="node-search">
+          <el-input v-model="nodeSearchQuery" size="mini" prefix-icon="el-icon-search" placeholder="搜索节点名称" clearable />
+        </div>
         <div class="node-list">
           <div
-            v-for="node in availableNodes"
+            v-for="node in filteredNodes"
             :key="node.nodeCode"
             class="node-item"
             draggable
@@ -29,47 +32,148 @@
             <div class="node-name">{{ node.nodeName }}</div>
             <div class="node-code">{{ node.nodeCode }}</div>
           </div>
-          <div v-if="availableNodes.length === 0" class="empty-tip">
+          <div v-if="filteredNodes.length === 0" class="empty-tip">
             暂无可用节点<br>请点击"新建节点"
           </div>
         </div>
       </div>
       <!-- 画布区域 -->
       <div ref="graphContainer" class="graph-container" @dragover.prevent @drop="handleDrop" />
+      <!-- 节点右键下拉菜单 -->
+      <div
+        v-show="contextMenuVisible"
+        class="node-context-menu"
+        :style="{ left: contextMenuPosition.x + 'px', top: contextMenuPosition.y + 'px' }"
+      >
+        <div class="context-menu-item" @click="handleMenuEdit">
+          <i class="el-icon-edit" /> 编辑
+        </div>
+        <div class="context-menu-item context-menu-item--danger" @click="handleMenuDelete">
+          <i class="el-icon-delete" /> 删除
+        </div>
+      </div>
     </div>
 
     <!-- 新建/编辑节点对话框 -->
-    <el-dialog :visible.sync="nodeDialogVisible" :title="nodeDialogTitle" width="500px" :close-on-click-modal="false" :append-to-body="true">
-      <el-form ref="nodeFormRef" :model="nodeForm" label-width="100px">
-        <el-form-item label="节点编码" prop="nodeCode" :rules="[{ required: true, message: '节点编码不能为空' }]">
-          <el-input v-model="nodeForm.nodeCode" :disabled="isEditMode" placeholder="请输入节点编码" />
-        </el-form-item>
-        <el-form-item label="节点名称" prop="nodeName" :rules="[{ required: true, message: '节点名称不能为空' }]">
-          <el-input v-model="nodeForm.nodeName" placeholder="请输入节点名称" />
-        </el-form-item>
-        <el-form-item label="执行类ID" prop="beanId">
-          <el-input v-model="nodeForm.beanId" placeholder="请输入执行类ID" />
-        </el-form-item>
-        <el-form-item label="执行方法" prop="methodName">
-          <el-input v-model="nodeForm.methodName" placeholder="请输入执行方法名称" />
-        </el-form-item>
-        <el-form-item label="执行参数" prop="runParam">
-          <el-input v-model="nodeForm.runParam" type="textarea" :rows="2" placeholder="请输入执行参数" />
-        </el-form-item>
+    <el-dialog :visible.sync="nodeDialogVisible" :title="nodeDialogTitle" width="800px" :close-on-click-modal="false" :append-to-body="true">
+      <el-form ref="nodeFormRef" :model="nodeForm" label-width="120px">
+        <!-- 新建节点模式：SyDagNode字段 -->
+        <template v-if="!isEditMode">
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="节点编码" prop="nodeCode">
+                <el-input v-model="nodeForm.nodeCode" placeholder="请输入节点编码" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="节点名称" prop="nodeName">
+                <el-input v-model="nodeForm.nodeName" placeholder="请输入节点名称" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="执行类ID" prop="beanId">
+                <el-input v-model="nodeForm.beanId" placeholder="请输入执行类ID" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="执行方法" prop="methodName">
+                <el-input v-model="nodeForm.methodName" placeholder="请输入执行方法名称" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="24">
+              <el-form-item label="执行参数" prop="runParam">
+                <div class="run-param-wrapper">
+                  <el-input v-model="nodeForm.runParam" type="textarea" :rows="6" placeholder="执行参数JSON" />
+                  <el-button type="text" size="mini" icon="el-icon-view" @click="openJsonViewer">查看JSON</el-button>
+                </div>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </template>
+        <!-- 编辑节点模式：DAG流程参数 -->
+        <template v-else>
+          <!-- 第一行：DAG流程明细ID + DAG主表ID -->
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="DAG流程明细ID" prop="dagFlowId">
+                <el-input v-model="nodeForm.dagFlowId" disabled placeholder="DAG流程明细ID" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="DAG主表ID" prop="dagId">
+                <el-input v-model="nodeForm.dagId" disabled placeholder="DAG主表ID" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <!-- 第二行：节点编码 + 节点名称 -->
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="节点编码" prop="nodeCode">
+                <el-input v-model="nodeForm.nodeCode" disabled placeholder="节点编码" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="节点名称" prop="nodeName">
+                <el-input v-model="nodeForm.nodeName" disabled placeholder="节点名称" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <!-- 第三行：上级节点 + 下级节点 -->
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="上级节点" prop="preNodeCode">
+                <el-input :value="getNodeDisplayName(nodeForm.preNodeCode)" disabled placeholder="无" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="下级节点" prop="nextNodeCode">
+                <el-input :value="getNodeDisplayName(nodeForm.nextNodeCode)" disabled placeholder="无" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <!-- 执行参数 + 分页参数 -->
+          <el-row :gutter="20">
+            <el-col :span="13">
+              <el-form-item label="执行参数" prop="runParam">
+                <div class="run-param-wrapper">
+                  <el-input v-model="nodeForm.runParam" type="textarea" :rows="8" placeholder="执行参数JSON" />
+                  <el-button type="text" size="mini" icon="el-icon-view" @click="openJsonViewer">查看JSON</el-button>
+                </div>
+              </el-form-item>
+            </el-col>
+            <el-col :span="11">
+              <el-form-item label="分页索引" prop="pageIndex">
+                <el-input-number v-model="nodeForm.pageIndex" :min="0" placeholder="请输入分页索引" style="width: 100%;" @change="syncPageParamsToJson" />
+              </el-form-item>
+              <el-form-item label="分页大小" prop="pageSize">
+                <el-input-number v-model="nodeForm.pageSize" :min="1" placeholder="请输入分页大小" style="width: 100%;" @change="syncPageParamsToJson" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </template>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="nodeDialogVisible = false">取消</el-button>
         <el-button type="primary" @click="saveNode">确定</el-button>
       </div>
     </el-dialog>
+    <!-- JSON查看器 -->
+    <json-viewer ref="jsonViewer" @save="onJsonSave" />
   </div>
 </template>
 
 <script>
 import G6 from '@antv/g6'
+import JsonViewer from '@/components/JsonViewer'
+import { insertSyDagNode } from '@/api/quantization/SyDagNodeApi'
 
 export default {
   name: 'DagDesigner',
+  components: { JsonViewer },
   props: {
     dagId: { type: String, default: '' },
     initialNodes: { type: Array, default: () => [] },
@@ -84,13 +188,41 @@ export default {
       nodeDialogTitle: '新建节点',
       isEditMode: false,
       editingNodeId: null,
+      nodeSearchQuery: '',
+      contextMenuVisible: false,
+      contextMenuPosition: { x: 0, y: 0 },
+      contextMenuNodeModel: null,
+      selectedNodeCode: '',
       nodeForm: {
+        dagFlowId: '',
+        dagId: '',
         nodeCode: '',
         nodeName: '',
-        beanId: '',
-        methodName: '',
-        runParam: ''
+        preNodeCode: '',
+        nextNodeCode: '',
+        runParam: '',
+        pageIndex: 0,
+        pageSize: 100
       }
+    }
+  },
+  computed: {
+    filteredNodes() {
+      if (!this.nodeSearchQuery) {
+        return this.availableNodes
+      }
+      const query = this.nodeSearchQuery.toLowerCase()
+      return this.availableNodes.filter(node =>
+        node.nodeName && node.nodeName.toLowerCase().includes(query)
+      )
+    },
+    // 节点编码到节点名称的映射缓存
+    nodeNameMap() {
+      const map = {}
+      this.availableNodes.forEach(node => {
+        map[node.nodeCode] = node.nodeName
+      })
+      return map
     }
   },
   mounted() {
@@ -195,24 +327,13 @@ export default {
       // 加载初始数据
       this.loadInitialData()
 
-      // 监听双击节点事件 - 编辑节点
-      this.graph.on('node:dblclick', (evt) => {
-        const node = evt.item
-        const model = node.getModel()
-        this.editNode(model)
-      })
-
-      // 监听右键删除节点
+      // 监听右键菜单 - 节点操作
       this.graph.on('node:contextmenu', (evt) => {
         evt.preventDefault()
         const node = evt.item
-        this.$confirm('确定删除该节点及其关联的边吗？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.graph.removeItem(node)
-        }).catch(() => {})
+        const model = node.getModel()
+        const { clientX, clientY } = evt.originalEvent || evt
+        this.showContextMenu(clientX, clientY, model)
       })
 
       // 监听右键删除边
@@ -228,11 +349,12 @@ export default {
         }).catch(() => {})
       })
 
-      // 监听画布点击取消选中
+      // 监听画布点击取消选中并关闭右键菜单
       this.graph.on('canvas:click', () => {
         this.graph.getNodes().forEach(node => {
           this.graph.setItemState(node, 'selected', false)
         })
+        this.hideContextMenu()
       })
     },
     handleResize() {
@@ -250,6 +372,7 @@ export default {
         label: n.nodeName || n.label || n.nodeCode || n.id,
         nodeCode: n.nodeCode || n.id,
         nodeName: n.nodeName || n.label,
+        dagFlowId: n.dagFlowId || '',
         beanId: n.beanId || '',
         methodName: n.methodName || '',
         runParam: n.runParam || '',
@@ -319,7 +442,115 @@ export default {
         this.graph.clear()
       }).catch(() => {})
     },
-    // 拖拽添加节点
+    // 获取节点显示名称（节点名称(节点编码)）
+    getNodeDisplayName(nodeCode) {
+      if (!nodeCode) return ''
+      const nodeName = this.nodeNameMap[nodeCode]
+      if (nodeName) {
+        return `${nodeName}（${nodeCode}）`
+      }
+      return nodeCode
+    },
+    // 打开JSON查看器
+    openJsonViewer() {
+      this.$refs.jsonViewer.show(this.nodeForm.runParam, '执行参数')
+    },
+    // JSON查看器保存回调
+    onJsonSave(jsonString) {
+      this.nodeForm.runParam = jsonString
+      this.$message.success('执行参数已更新')
+    },
+    // 同步分页参数到JSON
+    syncPageParamsToJson() {
+      try {
+        let params = {}
+        if (this.nodeForm.runParam && this.nodeForm.runParam.trim()) {
+          try {
+            const parsed = JSON.parse(this.nodeForm.runParam)
+            if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+              params = parsed
+            }
+          } catch (e) {
+            // runParam 不是有效 JSON 对象，保留原样不处理
+            return
+          }
+        }
+        params.pageIndex = this.nodeForm.pageIndex
+        params.pageSize = this.nodeForm.pageSize
+        this.nodeForm.runParam = JSON.stringify(params, null, 2)
+      } catch (e) {
+        console.warn('同步分页参数到JSON失败:', e)
+      }
+    },
+    getPreNodeCode(nodeId) {
+      if (!this.graph) return ''
+      const edges = this.graph.getEdges()
+      for (const edge of edges) {
+        const model = edge.getModel()
+        if (model.target === nodeId) {
+          return model.source
+        }
+      }
+      return ''
+    },
+    // 获取节点的下级节点编码
+    getNextNodeCode(nodeId) {
+      if (!this.graph) return ''
+      const edges = this.graph.getEdges()
+      for (const edge of edges) {
+        const model = edge.getModel()
+        if (model.source === nodeId) {
+          return model.target
+        }
+      }
+      return ''
+    },
+    // 显示节点右键下拉菜单
+    showContextMenu(x, y, model) {
+      this.contextMenuNodeModel = model
+      this.contextMenuPosition = { x, y }
+      this.contextMenuVisible = true
+      // 点击其他地方关闭菜单
+      this.$nextTick(() => {
+        const closeHandler = (e) => {
+          if (!e.target.closest('.node-context-menu')) {
+            this.hideContextMenu()
+            document.removeEventListener('click', closeHandler)
+          }
+        }
+        setTimeout(() => {
+          document.addEventListener('click', closeHandler)
+        }, 0)
+      })
+    },
+    // 隐藏右键下拉菜单
+    hideContextMenu() {
+      this.contextMenuVisible = false
+      this.contextMenuNodeModel = null
+    },
+    // 处理菜单编辑
+    handleMenuEdit() {
+      if (this.contextMenuNodeModel) {
+        this.editNode(this.contextMenuNodeModel)
+      }
+      this.hideContextMenu()
+    },
+    // 处理菜单删除
+    handleMenuDelete() {
+      if (this.contextMenuNodeModel) {
+        const node = this.graph.findById(this.contextMenuNodeModel.id)
+        if (node) {
+          this.$confirm('确定删除该节点及其关联的边吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.graph.removeItem(node)
+          }).catch(() => {})
+        }
+      }
+      this.hideContextMenu()
+    },
     handleDragStart(e, node) {
       e.dataTransfer.setData('node', JSON.stringify(node))
     },
@@ -361,29 +592,63 @@ export default {
     showAddNodeDialog() {
       this.isEditMode = false
       this.nodeDialogTitle = '新建节点'
+      this.selectedNodeCode = ''
       this.nodeForm = {
+        dagFlowId: '',
+        dagId: this.dagId || '',
         nodeCode: '',
         nodeName: '',
         beanId: '',
         methodName: '',
-        runParam: ''
+        preNodeCode: '',
+        nextNodeCode: '',
+        runParam: '',
+        pageIndex: 0,
+        pageSize: 100
       }
       this.nodeDialogVisible = true
+    },
+    // 选择节点后自动填充节点信息
+    onSelectNodeForAdd(nodeCode) {
+      if (!nodeCode) return
+      const node = this.availableNodes.find(n => n.nodeCode === nodeCode)
+      if (node) {
+        this.nodeForm.nodeCode = node.nodeCode
+        this.nodeForm.nodeName = node.nodeName
+        this.nodeForm.runParam = node.runParam || ''
+      }
     },
     editNode(model) {
       this.isEditMode = true
       this.editingNodeId = model.id
-      this.nodeDialogTitle = '编辑节点'
+      this.nodeDialogTitle = '编辑节点流程参数'
+      // 从 graph 中获取当前节点的上下级关系
+      const preNodeCode = this.getPreNodeCode(model.id)
+      const nextNodeCode = this.getNextNodeCode(model.id)
+      // 从 runParam 中解析 pageIndex 和 pageSize
+      let pageIndex = 0
+      let pageSize = 100
+      try {
+        const params = JSON.parse(model.runParam || '{}')
+        if (params.pageIndex !== undefined) pageIndex = params.pageIndex
+        if (params.pageSize !== undefined) pageSize = params.pageSize
+      } catch (e) {
+        // JSON 解析失败时使用默认值
+      }
       this.nodeForm = {
+        dagFlowId: model.dagFlowId || '',
+        dagId: this.dagId || '',
         nodeCode: model.nodeCode || model.id,
         nodeName: model.nodeName || model.label || '',
-        beanId: model.beanId || '',
-        methodName: model.methodName || '',
-        runParam: model.runParam || ''
+        preNodeCode: preNodeCode || '',
+        nextNodeCode: nextNodeCode || '',
+        runParam: model.runParam || '',
+        pageIndex: pageIndex,
+        pageSize: pageSize
       }
       this.nodeDialogVisible = true
     },
-    saveNode() {
+    async saveNode() {
       if (!this.nodeForm.nodeCode) {
         this.$message.error('节点编码不能为空')
         return
@@ -394,36 +659,32 @@ export default {
       }
 
       if (this.isEditMode) {
-        // 更新画布中的节点
+        // 编辑模式：更新画布中的节点
         const node = this.graph.findById(this.editingNodeId)
         if (node) {
           this.graph.updateItem(node, {
-            id: this.nodeForm.nodeCode,
-            label: this.nodeForm.nodeName,
-            nodeCode: this.nodeForm.nodeCode,
-            nodeName: this.nodeForm.nodeName,
-            beanId: this.nodeForm.beanId,
-            methodName: this.nodeForm.methodName,
             runParam: this.nodeForm.runParam
           })
         }
+        this.nodeDialogVisible = false
       } else {
-        // 新建节点，添加到画布
-        this.addNodeToGraph({
-          id: this.nodeForm.nodeCode,
-          label: this.nodeForm.nodeName,
+        // 新建模式：调用API创建SyDagNode节点
+        const saveData = {
           nodeCode: this.nodeForm.nodeCode,
           nodeName: this.nodeForm.nodeName,
-          beanId: this.nodeForm.beanId,
-          methodName: this.nodeForm.methodName,
-          runParam: this.nodeForm.runParam
-        })
-
-        // 通知父组件有新增节点
-        this.$emit('node-created', { ...this.nodeForm })
+          beanId: this.nodeForm.beanId || '',
+          methodName: this.nodeForm.methodName || '',
+          runParam: this.nodeForm.runParam || ''
+        }
+        try {
+          await insertSyDagNode(saveData)
+          this.$message.success('节点创建成功')
+          this.$emit('node-created', { ...saveData })
+          this.nodeDialogVisible = false
+        } catch (err) {
+          this.$message.error('节点创建失败：' + (err.message || err))
+        }
       }
-
-      this.nodeDialogVisible = false
     },
     // 获取当前DAG数据，供父组件保存
     getGraphData() {
@@ -439,6 +700,7 @@ export default {
         nodes.push({
           nodeCode: model.nodeCode || model.id,
           nodeName: model.nodeName || model.label,
+          dagFlowId: model.dagFlowId || '',
           beanId: model.beanId || '',
           methodName: model.methodName || '',
           runParam: model.runParam || '',
@@ -506,6 +768,13 @@ export default {
   font-weight: bold;
   font-size: 14px;
 }
+.node-search {
+  padding: 10px;
+  border-bottom: 1px solid #e8e8e8;
+}
+.node-search .el-input__inner {
+  border-radius: 4px;
+}
 .node-list {
   flex: 1;
   overflow-y: auto;
@@ -549,5 +818,33 @@ export default {
   overflow: hidden;
   position: relative;
   background: #f8f9fa;
+}
+/* 节点右键下拉菜单 */
+.node-context-menu {
+  position: fixed;
+  z-index: 2000;
+  min-width: 120px;
+  background: #fff;
+  border: 1px solid #ebeef5;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+}
+.context-menu-item {
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #606266;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.context-menu-item:hover {
+  background-color: #f5f7fa;
+  color: #409eff;
+}
+.context-menu-item--danger:hover {
+  color: #f56c6c;
 }
 </style>

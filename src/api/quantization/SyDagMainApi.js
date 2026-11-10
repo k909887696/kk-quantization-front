@@ -19,7 +19,7 @@ export function getSyDagMainPageList(params, isLoading) {
 // 删除DAG主表
 export function deleteSyDagMainById(params, isLoading) {
   return request({
-      url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagMain/deleteSyDagMainById',
+    url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagMain/deleteSyDagMainById',
     method: 'post',
     data: params,
     isLoading
@@ -47,6 +47,15 @@ export function updateSyDagMain(params, isLoading) {
 export function getSyDagMainDetails(params, isLoading) {
   return request({
     url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagMain/getSyDagMainDetails',
+    method: 'post',
+    data: params,
+    isLoading
+  })
+}
+// 更新DAG主表状态
+export function updateSyDagMainStatus(params, isLoading) {
+  return request({
+    url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagMain/updateSyDagMainStatus',
     method: 'post',
     data: params,
     isLoading

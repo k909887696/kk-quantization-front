@@ -164,7 +164,14 @@ const constantRoutes = [
             name: 'quantization_SyDagProcessMainList',
             component: () => import('@/views/quantization/settings/SyDagProcessMainList'),
             meta: { title: 'DAG实例', icon: 'table', menus: 'v_menu_select_SyDagProcessMain', check_permission: false }
-          }, {
+          }, 
+          {
+            path: 'SyDagProcessFlowList',
+            name: 'quantization_SyDagProcessFlowList',
+            component: () => import('@/views/quantization/settings/SyDagProcessFlowList'),
+            meta: { title: 'DAG实例流程', icon: 'table', menus: 'v_menu_select_SyDagProcessFlow', check_permission: false }
+          },
+          {
             path: 'SyDagProcessTaskList',
             name: 'quantization_SyDagProcessTaskList',
             component: () => import('@/views/quantization/settings/SyDagProcessTaskList'),
