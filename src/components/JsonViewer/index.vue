@@ -37,6 +37,7 @@
                 v-model="rawJson"
                 class="json-textarea"
                 spellcheck="false"
+                :readonly="readonly"
                 @input="onRawInput"
                 @scroll="syncScroll"
               />
@@ -67,7 +68,7 @@
 
     <div slot="footer" class="dialog-footer">
       <el-button @click="visible = false">关闭</el-button>
-      <el-button type="primary" icon="el-icon-check" @click="saveJson">保存</el-button>
+      <el-button v-if="!readonly" type="primary" icon="el-icon-check" @click="saveJson">保存</el-button>
     </div>
   </el-dialog>
 </template>
@@ -281,6 +282,10 @@ const JsonTreeNode = {
 export default {
   name: 'JsonViewer',
   components: { JsonTreeNode },
+  props: {
+    // 只读模式：隐藏保存按钮且源数据不可编辑，用于查看详情
+    readonly: { type: Boolean, default: false }
+  },
   data() {
     return {
       visible: false,

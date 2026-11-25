@@ -19,7 +19,7 @@ export function getSyDagProcessMainPageList(params, isLoading) {
 // 删除DAG执行实例主表
 export function deleteSyDagProcessMainById(params, isLoading) {
   return request({
-      url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagProcessMain/deleteSyDagProcessMainById',
+    url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagProcessMain/deleteSyDagProcessMainById',
     method: 'post',
     data: params,
     isLoading
@@ -47,6 +47,24 @@ export function updateSyDagProcessMain(params, isLoading) {
 export function getSyDagProcessMainDetails(params, isLoading) {
   return request({
     url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagProcessMain/getSyDagProcessMainDetails',
+    method: 'post',
+    data: params,
+    isLoading
+  })
+}
+// 重新执行DAG执行实例（状态置待执行并清空执行次数）
+export function restartSyDagProcessMain(params, isLoading) {
+  return request({
+    url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagProcessMain/restartSyDagProcessMain',
+    method: 'post',
+    data: params,
+    isLoading
+  })
+}
+// 批量重新执行DAG执行实例
+export function batchRestartSyDagProcessMain(params, isLoading) {
+  return request({
+    url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagProcessMain/batchRestartSyDagProcessMain',
     method: 'post',
     data: params,
     isLoading

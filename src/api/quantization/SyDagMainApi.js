@@ -61,3 +61,12 @@ export function updateSyDagMainStatus(params, isLoading) {
     isLoading
   })
 }
+// 重新执行DAG主表（状态置启用并清空执行次数）
+export function restartSyDagMain(params, isLoading) {
+  return request({
+    url: config.quantization_api_url + '/quantization/v/vapi/v1/VSyDagMain/restartSyDagMain',
+    method: 'post',
+    data: params,
+    isLoading
+  })
+}

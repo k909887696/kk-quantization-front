@@ -4,16 +4,21 @@
     <div class="toolbar">
       <el-button-group>
         <el-button size="mini" type="primary" icon="el-icon-s-grid" @click="autoLayout">自动布局</el-button>
-        <el-button size="mini" icon="el-icon-delete" @click="clearCanvas">清空画布</el-button>
+        <el-button v-if="!readonly" size="mini" icon="el-icon-delete" @click="clearCanvas">清空画布</el-button>
         <el-button size="mini" icon="el-icon-full-screen" @click="fitView">适应视图</el-button>
         <el-button size="mini" icon="el-icon-zoom-in" @click="zoomIn">放大</el-button>
         <el-button size="mini" icon="el-icon-zoom-out" @click="zoomOut">缩小</el-button>
       </el-button-group>
-      <span class="toolbar-tip">拖拽左侧节点到画布；点击两个节点连线</span>
+      <div v-if="readonly" class="status-legend">
+        <span v-for="item in flowStatusOptions" :key="item.value" class="legend-item">
+          <i class="legend-dot" :style="{ backgroundColor: item.fill, borderColor: item.stroke }" />{{ item.label }}
+        </span>
+      </div>
+      <span class="toolbar-tip">{{ readonly ? '只读查看：点击节点查看执行详情' : '拖拽左侧节点到画布；点击两个节点连线' }}</span>
     </div>
     <div class="content">
       <!-- 左侧节点面板 -->
-      <div class="node-panel">
+      <div v-if="!readonly" class="node-panel">
         <div class="panel-header">
           <span>节点列表</span>
           <el-button size="mini" type="primary" plain @click="showAddNodeDialog">+ 新建节点</el-button>
@@ -41,7 +46,7 @@
       <div ref="graphContainer" class="graph-container" @dragover.prevent @drop="handleDrop" />
       <!-- 节点右键下拉菜单 -->
       <div
-        v-show="contextMenuVisible"
+        v-show="contextMenuVisible && !readonly"
         class="node-context-menu"
         :style="{ left: contextMenuPosition.x + 'px', top: contextMenuPosition.y + 'px' }"
       >
@@ -161,8 +166,58 @@
         <el-button type="primary" @click="saveNode">确定</el-button>
       </div>
     </el-dialog>
+    <!-- 只读模式下的节点执行详情 -->
+    <el-dialog :visible.sync="nodeDetailVisible" title="节点执行详情" width="640px" :close-on-click-modal="false" :append-to-body="true">
+      <div class="node-detail">
+        <div class="detail-row">
+          <span class="detail-label">节点名称</span>
+          <span class="detail-value">{{ nodeDetail.nodeName }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">节点编码</span>
+          <span class="detail-value">{{ nodeDetail.nodeCode }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">执行状态</span>
+          <span class="detail-value">
+            <el-tag :type="statusTagType(nodeDetail.status)" size="mini">{{ statusLabel(nodeDetail.status) }}</el-tag>
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">预执行时间</span>
+          <span class="detail-value">{{ formatTime(nodeDetail.preRunTime) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">执行时间</span>
+          <span class="detail-value">{{ formatTime(nodeDetail.runTime) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">完成时间</span>
+          <span class="detail-value">{{ formatTime(nodeDetail.finishTime) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">异常信息</span>
+          <span class="detail-value detail-pre">{{ nodeDetail.exMessage || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">执行参数</span>
+          <span class="detail-value detail-param">
+            <template v-if="nodeDetail.runParam">
+              <pre v-if="nodeDetailRunParamInline" class="detail-json">{{ nodeDetailRunParamText }}</pre>
+              <el-button class="detail-json-btn" type="text" size="mini" icon="el-icon-view" @click="$refs.jsonViewer.show(nodeDetail.runParam, '执行参数')">
+                查看JSON
+              </el-button>
+            </template>
+            <span v-else>-</span>
+          </span>
+        </div>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="nodeDetailVisible = false">关闭</el-button>
+      </div>
+    </el-dialog>
     <!-- JSON查看器 -->
-    <json-viewer ref="jsonViewer" @save="onJsonSave" />
+    <json-viewer ref="jsonViewer" :readonly="readonly" @save="onJsonSave" />
   </div>
 </template>
 
@@ -170,6 +225,18 @@
 import G6 from '@antv/g6'
 import JsonViewer from '@/components/JsonViewer'
 import { insertSyDagNode } from '@/api/quantization/SyDagNodeApi'
+import { parseTime } from '@/utils/index.js'
+
+// 实例流程状态字典与对应节点配色（0:待执行 1:执行中 2:成功 3:失败）
+const FLOW_STATUS_OPTIONS = [
+  { value: '0', label: '待执行', fill: '#f4f4f5', stroke: '#909399', tag: 'info' },
+  { value: '1', label: '执行中', fill: '#e6f7ff', stroke: '#1890ff', tag: '' },
+  { value: '2', label: '成功', fill: '#f0f9eb', stroke: '#67c23a', tag: 'success' },
+  { value: '3', label: '失败', fill: '#fef0f0', stroke: '#f56c6c', tag: 'danger' }
+]
+
+// 节点执行参数格式化后不超过该行数时，直接在详情里展示
+const NODE_PARAM_INLINE_MAX_LINES = 10
 
 export default {
   name: 'DagDesigner',
@@ -178,7 +245,9 @@ export default {
     dagId: { type: String, default: '' },
     initialNodes: { type: Array, default: () => [] },
     initialEdges: { type: Array, default: () => [] },
-    availableNodes: { type: Array, default: () => [] }
+    availableNodes: { type: Array, default: () => [] },
+    // 只读模式：用于查看详情，隐藏编辑相交互（拖节点、连线、新建/删除）
+    readonly: { type: Boolean, default: false }
   },
   data() {
     return {
@@ -193,6 +262,9 @@ export default {
       contextMenuPosition: { x: 0, y: 0 },
       contextMenuNodeModel: null,
       selectedNodeCode: '',
+      flowStatusOptions: FLOW_STATUS_OPTIONS,
+      nodeDetailVisible: false,
+      nodeDetail: {},
       nodeForm: {
         dagFlowId: '',
         dagId: '',
@@ -223,6 +295,22 @@ export default {
         map[node.nodeCode] = node.nodeName
       })
       return map
+    },
+    // 节点执行参数格式化文本（解析失败时原样展示）
+    nodeDetailRunParamText() {
+      const raw = this.nodeDetail.runParam
+      if (!raw) return ''
+      if (typeof raw === 'object') return JSON.stringify(raw, null, 2)
+      try {
+        return JSON.stringify(JSON.parse(raw), null, 2)
+      } catch (e) {
+        return String(raw)
+      }
+    },
+    // 格式化后不超过10行时直接展示，超出仍只保留查看JSON按钮
+    nodeDetailRunParamInline() {
+      const text = this.nodeDetailRunParamText
+      return !!text && text.split('\n').length <= NODE_PARAM_INLINE_MAX_LINES
     }
   },
   mounted() {
@@ -271,12 +359,14 @@ export default {
         fitView: false,
         fitCenter: true,
         modes: {
-          default: [
-            'drag-canvas',
-            'zoom-canvas',
-            'drag-node',
-            { type: 'create-edge', trigger: 'click' }
-          ]
+          default: this.readonly
+            ? ['drag-canvas', 'zoom-canvas']
+            : [
+              'drag-canvas',
+              'zoom-canvas',
+              'drag-node',
+              { type: 'create-edge', trigger: 'click' }
+            ]
         },
         defaultNode: {
           type: 'rect',
@@ -286,7 +376,7 @@ export default {
             stroke: '#1890ff',
             lineWidth: 2,
             radius: 6,
-            cursor: 'move'
+            cursor: this.readonly ? 'pointer' : 'move'
           },
           labelCfg: {
             style: {
@@ -329,6 +419,7 @@ export default {
 
       // 监听右键菜单 - 节点操作
       this.graph.on('node:contextmenu', (evt) => {
+        if (this.readonly) return
         evt.preventDefault()
         const node = evt.item
         const model = node.getModel()
@@ -338,6 +429,7 @@ export default {
 
       // 监听右键删除边
       this.graph.on('edge:contextmenu', (evt) => {
+        if (this.readonly) return
         evt.preventDefault()
         const edge = evt.item
         this.$confirm('确定删除该连线吗？', '提示', {
@@ -356,6 +448,13 @@ export default {
         })
         this.hideContextMenu()
       })
+
+      // 只读模式：点击节点查看执行详情
+      if (this.readonly) {
+        this.graph.on('node:click', (evt) => {
+          this.showNodeDetail(evt.item.getModel())
+        })
+      }
     },
     handleResize() {
       if (!this.graph || this.graph.get('destroyed')) return
@@ -367,18 +466,40 @@ export default {
     loadInitialData() {
       if (!this.graph) return
 
-      const nodes = this.initialNodes.map(n => ({
-        id: n.nodeCode || n.id,
-        label: n.nodeName || n.label || n.nodeCode || n.id,
-        nodeCode: n.nodeCode || n.id,
-        nodeName: n.nodeName || n.label,
-        dagFlowId: n.dagFlowId || '',
-        beanId: n.beanId || '',
-        methodName: n.methodName || '',
-        runParam: n.runParam || '',
-        x: n.x,
-        y: n.y
-      }))
+      const nodes = this.initialNodes.map(n => {
+        const status = (n.status === null || n.status === undefined) ? '' : String(n.status)
+        const statusOption = FLOW_STATUS_OPTIONS.find(item => item.value === status)
+        const node = {
+          id: n.nodeCode || n.id,
+          label: n.nodeName || n.label || n.nodeCode || n.id,
+          nodeCode: n.nodeCode || n.id,
+          nodeName: n.nodeName || n.label,
+          dagFlowId: n.dagFlowId || '',
+          beanId: n.beanId || '',
+          methodName: n.methodName || '',
+          runParam: n.runParam || '',
+          status: status,
+          x: n.x,
+          y: n.y
+        }
+        // 按实例流程状态着色，无状态时保持默认样式
+        if (statusOption) {
+          node.style = {
+            fill: statusOption.fill,
+            stroke: statusOption.stroke,
+            lineWidth: 2,
+            radius: 6,
+            cursor: this.readonly ? 'pointer' : 'move'
+          }
+        }
+        // 只读详情需要的执行实例流程字段
+        node.processFlowId = n.processFlowId || ''
+        node.preRunTime = n.preRunTime
+        node.runTime = n.runTime
+        node.finishTime = n.finishTime
+        node.exMessage = n.exMessage || ''
+        return node
+      })
 
       const edges = this.initialEdges.map(e => ({
         source: e.nodeCode || e.source,
@@ -507,6 +628,7 @@ export default {
     },
     // 显示节点右键下拉菜单
     showContextMenu(x, y, model) {
+      if (this.readonly) return
       this.contextMenuNodeModel = model
       this.contextMenuPosition = { x, y }
       this.contextMenuVisible = true
@@ -555,6 +677,7 @@ export default {
       e.dataTransfer.setData('node', JSON.stringify(node))
     },
     handleDrop(e) {
+      if (this.readonly) return
       e.preventDefault()
       const data = e.dataTransfer.getData('node')
       if (!data) return
@@ -686,6 +809,32 @@ export default {
         }
       }
     },
+    // 只读模式：展示节点执行详情
+    showNodeDetail(model) {
+      if (!model) return
+      this.nodeDetail = {
+        nodeCode: model.nodeCode || model.id,
+        nodeName: model.nodeName || model.label,
+        status: model.status,
+        preRunTime: model.preRunTime,
+        runTime: model.runTime,
+        finishTime: model.finishTime,
+        exMessage: model.exMessage,
+        runParam: model.runParam
+      }
+      this.nodeDetailVisible = true
+    },
+    statusLabel(status) {
+      const item = FLOW_STATUS_OPTIONS.find(o => o.value === String(status))
+      return item ? item.label : (status || '-')
+    },
+    statusTagType(status) {
+      const item = FLOW_STATUS_OPTIONS.find(o => o.value === String(status))
+      return item ? item.tag : 'info'
+    },
+    formatTime(time) {
+      return time ? parseTime(new Date(time), '{y}-{m}-{d} {h}:{i}:{s}') : '-'
+    },
     // 获取当前DAG数据，供父组件保存
     getGraphData() {
       if (!this.graph || this.graph.get('destroyed')) {
@@ -743,6 +892,70 @@ export default {
 .toolbar-tip {
   font-size: 12px;
   color: #999;
+}
+.status-legend {
+  display: flex;
+  align-items: center;
+}
+.legend-item {
+  margin-right: 12px;
+  font-size: 12px;
+  color: #606266;
+}
+.legend-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 4px;
+  vertical-align: middle;
+  border: 2px solid;
+  border-radius: 3px;
+}
+.node-detail {
+  padding: 0 10px;
+}
+.node-detail .detail-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 6px 0;
+  border-bottom: 1px dashed #ebeef5;
+  font-size: 13px;
+}
+.node-detail .detail-label {
+  width: 100px;
+  flex-shrink: 0;
+  color: #909399;
+}
+.node-detail .detail-value {
+  flex: 1;
+  color: #303133;
+  word-break: break-all;
+}
+.node-detail .detail-pre {
+  white-space: pre-wrap;
+}
+.node-detail .detail-param {
+  display: flex;
+  align-items: flex-start;
+}
+.node-detail .detail-json {
+  flex: 1;
+  margin: 0;
+  padding: 6px 8px;
+  background: #f5f7fa;
+  border: 1px solid #ebeef5;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 220px;
+  overflow: auto;
+}
+.node-detail .detail-json-btn {
+  flex-shrink: 0;
+  margin-left: 8px;
+  padding: 0;
 }
 .content {
   display: flex;

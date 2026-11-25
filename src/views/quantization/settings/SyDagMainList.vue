@@ -24,13 +24,13 @@
             </el-select>
           </el-form-item>
           <el-form-item label="预执行时间:">
-            <el-date-picker v-model="listQuery.preRunTimeStart" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" /> -
-            <el-date-picker v-model="listQuery.preRunTimeEnd" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" />
+            <el-date-picker v-model="listQuery.preRunTimeStart" type="datetime" format="yyyy-MM-dd HH:mm:ss" value-format="yyyy-MM-dd HH:mm:ss" style="width: 180px;" placeholder="选择开始时间" /> -
+            <el-date-picker v-model="listQuery.preRunTimeEnd" type="datetime" format="yyyy-MM-dd HH:mm:ss" value-format="yyyy-MM-dd HH:mm:ss" style="width: 180px;" placeholder="选择结束时间" />
           </el-form-item>
 
           <el-form-item label="创建时间:">
-            <el-date-picker v-model="listQuery.createTimeStart" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" /> -
-            <el-date-picker v-model="listQuery.createTimeEnd" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 150px;" placeholder="选择时间" />
+            <el-date-picker v-model="listQuery.createTimeStart" type="datetime" format="yyyy-MM-dd HH:mm:ss" value-format="yyyy-MM-dd HH:mm:ss" style="width: 180px;" placeholder="选择开始时间" /> -
+            <el-date-picker v-model="listQuery.createTimeEnd" type="datetime" format="yyyy-MM-dd HH:mm:ss" value-format="yyyy-MM-dd HH:mm:ss" style="width: 180px;" placeholder="选择结束时间" />
           </el-form-item>
         </el-row>
         <el-row>
@@ -117,22 +117,26 @@
           {{ scope.row.exMessage }}
         </template>
       </el-table-column>
-      <el-table-column label="" align="center" width="300" class-name="small-padding fixed-width" fixed="right">
+      <el-table-column label="操作" align="center" width="280" class-name="small-padding fixed-width" fixed="right">
         <template slot-scope="{row}">
-          <el-button type="primary" icon="el-icon-edit" size="mini" @click="editDataDialog(row)">
+          <el-button type="success" icon="el-icon-refresh-right" size="mini" style="margin-bottom: 6px;" @click="restartData(row)">
+            重新执行
+          </el-button>
+          <el-button type="primary" icon="el-icon-edit" size="mini" style="margin-bottom: 6px;" @click="editDataDialog(row)">
             编辑
           </el-button>
-          <el-button
-            :type="row.status === 1 || row.status === '1' ? 'warning' : 'success'"
-            :icon="row.status === 1 || row.status === '1' ? 'el-icon-close' : 'el-icon-check'"
-            size="mini"
-            @click="toggleStatus(row)"
-          >
-            {{ row.status === 1 || row.status === '1' ? '禁用' : '启用' }}
-          </el-button>
-          <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteData(row)">
-            删除
-          </el-button>
+          <el-dropdown trigger="click" size="mini" @command="(cmd) => handleCommand(cmd, row)">
+            <el-button size="mini" icon="el-icon-more" style="margin-bottom: 6px;">更多</el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item :command="'toggleStatus'">
+                <i :class="row.status === 1 || row.status === '1' ? 'el-icon-close' : 'el-icon-check'" />
+                {{ row.status === 1 || row.status === '1' ? '禁用' : '启用' }}
+              </el-dropdown-item>
+              <el-dropdown-item command="deleteData" divided>
+                <i class="el-icon-delete" style="color: #f56c6c;" /> 删除
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -236,7 +240,7 @@
 </template>
 
 <script>
-import { getSyDagMainPageList, deleteSyDagMainById, insertSyDagMain, updateSyDagMain, getSyDagMainDetails, updateSyDagMainStatus } from '@/api/quantization/SyDagMainApi'
+import { getSyDagMainPageList, deleteSyDagMainById, insertSyDagMain, updateSyDagMain, getSyDagMainDetails, updateSyDagMainStatus, restartSyDagMain } from '@/api/quantization/SyDagMainApi'
 import { getSyDagNodePageList, insertSyDagNode } from '@/api/quantization/SyDagNodeApi'
 import { getSyDagFlowPageList } from '@/api/quantization/SyDagFlowApi'
 import Pagination from '@/components/Pagination'
@@ -320,8 +324,12 @@ export default {
         this.total = response.data === null ? 0 : response.data.totalCount
       })
     },
+    handleCommand(command, row) {
+      if (command === 'toggleStatus') this.toggleStatus(row)
+      else if (command === 'deleteData') this.deleteData(row)
+    },
     deleteData(row) {
-      this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+      this.$confirm('此操作将永久删除该DAG及其关联的流程数据和执行实例，是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -604,6 +612,24 @@ export default {
       }
     },
     parseTime: parseTime,
+    // 重新执行：状态置启用并清空执行次数，用于失败上限挂起后修复异常的人工恢复
+    restartData(row) {
+      this.$confirm('确认重新执行该DAG?（状态置启用并清空执行次数）', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        restartSyDagMain({ dagId: row.dagId }).then(() => {
+          this.$message.success('重新执行已触发')
+          this.getPageList()
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消重新执行'
+        })
+      })
+    },
     // 启用/禁用切换
     toggleStatus(row) {
       const newStatus = (row.status === 1 || row.status === '1') ? '0' : '1'

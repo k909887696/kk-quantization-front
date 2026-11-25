@@ -182,6 +182,12 @@ const constantRoutes = [
             name: 'quantization_SyDagProcessTaskHisList',
             component: () => import('@/views/quantization/settings/SyDagProcessTaskHisList'),
             meta: { title: 'DAG历史任务', icon: 'table', menus: 'v_menu_select_SyDagProcessTaskHis', check_permission: false }
+          },
+          {
+            path: 'DingdingSettingList',
+            name: 'quantization_DingdingSettingList',
+            component: () => import('@/views/quantization/settings/DingdingSettingList'),
+            meta: { title: '钉钉群机器人配置', icon: 'table', menus: 'v_menu_select_DingdingSetting', check_permission: false }
           }
         ]
       }
@@ -351,6 +357,20 @@ const constantRoutes = [
         name: 'gantt-elastic',
         component: () => import('@/views/meiya/project_manage/project_gantt'),
         meta: { title: '项目甘特表', icon: 'el-icon-date' }
+      }
+    ]
+  },
+  {
+    path: '/tools',
+    component: Layout,
+    name: 'Tools',
+    meta: { title: '工具', icon: 'el-icon-s-tools' },
+    children: [
+      {
+        path: 'excel',
+        name: 'ToolsExcel',
+        component: () => import('@/views/tools/ExcelTool'),
+        meta: { title: 'Excel 预览与合并', icon: 'el-icon-document', menus: 'menu_tools_excel', check_permission: false }
       }
     ]
   },
